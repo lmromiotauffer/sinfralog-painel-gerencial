@@ -1,0 +1,430 @@
+{
+  "filterpane": [
+    {
+      "label": "Contrato",
+      "expression": "=Contrato"
+    },
+    {
+      "label": "Situação do contrato",
+      "expression": "=[Situação atual do contrato]"
+    },    
+    {
+      "label": "Credor",
+      "expression": "=Credor"
+    },
+    {
+      "label": "Município",
+      "expression": "=[Município]"
+    },    
+    {
+      "label": "Tipo do contrato",
+      "expression": "=[Tipo do contrato]"
+    },
+    {
+      "label": "Classificação do contrato",
+      "expression": "=[Classificação do contrato]"
+    },
+    {
+      "label": "Situação da obra",
+      "expression": "=[Situação atual da obra]"
+    },
+    {
+      "label": "Objeto do contrato",
+      "expression": "=[Descrição do contrato]"
+    },
+    {
+      "label": "Ativo",
+      "expression": "=codigoAtivo"
+    },
+    {
+      "label": "Adjunta",
+      "expression": "=[Sigla adjunta]"
+    },
+    {
+      "label": "Descrição da obra",
+      "expression": "=[Descrição da obra]"
+    },
+    {
+      "label": "Tipo da obra",
+      "expression": "=[Tipo da obra]"
+    },
+    {
+      "label": "Classificação da obra",
+      "expression": "=[Classificação da obra]"
+    },
+    {
+      "label": "Setor responsável",
+      "expression": "=[Sigla órgão setor]"
+    },
+    {
+      "label": "Rodovia",
+      "expression": "=[Sigla da rodovia]"
+    },
+    {
+      "label": "Tipo da rodovia",
+      "expression": "=[Tipo da rodovia]"
+    }
+  ],
+  "map": {
+    "columns": [
+      {
+        "qFieldDefs": [
+          "={<cdTipoObra = {15,30,33,35,37,41,45}>} [_skObra]"
+        ],
+        "qFieldLabels": [
+          "identificador da obra"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "[Tipo da obra]"
+        ],
+        "qFieldLabels": [
+          "Tipo da obra"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "Contrato"
+        ],
+        "qFieldLabels": [
+          "Contrato"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "cdLote"
+        ],
+        "qFieldLabels": [
+          "Código da obra"
+        ],
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "[Local da obra]"
+        ],
+        "qFieldLabels": [
+          "Local da obra"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qDef": "num(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao) / Sum(valorServicoObra), '#.##0,00%')",
+        "qLabel": "Execução",
+        "type": "measure"
+      },
+      {
+        "qDef": "Sum(valorServicoObra)",
+        "qLabel": "Valor",
+        "type": "measure"
+      },
+      {
+        "qDef": "FirstSortedValue(DISTINCT urlFoto, -dataFotoDiarioObra)",
+        "qLabel": "Foto",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only([Descrição da obra])",
+        "qLabel": "Descrição da obra",
+        "type": "measure"
+      }
+    ]
+  },
+  "mapDetails": {
+    "detailsColumns": [
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} _skObra)",
+        "qLabel": "identificador da obra",
+        "type": "measure"
+      },
+      {
+        
+        "qDef": "Concat(DISTINCT {<[_skObra]={$(vObraSelecionada)}>} Contrato, ', ')",
+        "qLabel": "Contrato",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} [Descrição da obra])",
+        "qLabel": "Descrição da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} [Tipo da obra])",
+        "qLabel": "Tipo da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} [Classificação da obra])",
+        "qLabel": "Classificação da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} [Situação atual da obra])",
+        "qLabel": "Situação atual da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Date(Only({<[_skObra]={$(vObraSelecionada)}>} [Data fim execução da obra]))",
+        "qLabel": "Data fim execução da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Num(Sum({<[_skObra]={$(vObraSelecionada)}>} valorServicoObra), 'R$ #.##0,00')",
+        "qLabel": "Valor da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Num(Sum({<[_skObra]={$(vObraSelecionada)}, urlFoto=, [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao) / Sum({<[_skObra]={$(vObraSelecionada)}>} valorServicoObra) * 100, '#.##0,00') & '%'",
+        "qLabel": "% Execução",
+        "type": "measure"
+      },
+      {
+        "qDef": "Num(Sum({<[_skObra]={$(vObraSelecionada)}, _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma) / Sum({<[_skObra]={$(vObraSelecionada)}, urlFoto=>} valorServicoObra) * 100, '#.##0,00') & '%'",
+        "qLabel": "% Execução esperada",
+        "type": "measure"
+      },
+      {
+        "qDef": "If(Count({<[_skObra]={$(vObraSelecionada)}>} geoTrechoObra) > 0, '[' & Concat({<[_skObra]={$(vObraSelecionada)}>} geoTrechoObra, ',') & ']', Only({<[_skObra]={$(vObraSelecionada)}>} [Local da obra]))",
+        "qLabel": "Trecho",
+        "type": "measure"
+      },
+      {
+        "qDef": "If(Count({<[_skObra]={$(vObraSelecionada)}>} geoTrecho) > 0, '[' & Concat({<[_skObra]={$(vObraSelecionada)}>} geoTrecho, ',') & ']', Only({<[_skObra]={$(vObraSelecionada)}>} [Local da obra]))",
+        "qLabel": "GeoTrecho",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only({<[_skObra]={$(vObraSelecionada)}>} [Sigla da rodovia])",
+        "qLabel": "SiglaRodovia",
+        "type": "measure"
+      }
+    ],
+    "detailsLineChart": {
+      "columns": [
+        {
+          "qFieldDefs": [
+            "DEANOMES"
+          ],
+          "type": "dimension"
+        },
+        {
+          "qDef": "Num(RangeSum(Above(Sum({<urlFoto=, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, [_skObra]={$(vObraSelecionada)}>} valorCronograma),0,RowNo()))/Sum({<urlFoto=, [_skObra]={$(vObraSelecionada)}>} valorServicoObra) * 100, '#.##0,00') & '%'",
+          "qLabel": "Previsto (cronograma)",
+          "type": "measure"
+        },
+        {
+          "qDef": "=Num(RangeSum(Above(Sum({<urlFoto=, _skTempo={\"<$(=Date(MonthStart(Today()),'YYYYMMDD'))\"}, [tpValor]={\"PI\"}, [cdTipoCalculoMedicao]={1,2,3}, [flMedicaoAprovada]={\"S\"}, cdTipoObra={15,30,33,35,37,41,45}, [_skObra]={'$(vObraSelecionada)'}>} valorMedicao),0,RowNo())) / Sum({<urlFoto=, _skTempo={\"<$(=Date(MonthStart(Today()),'YYYYMMDD'))\"}, [_skObra]={'$(vObraSelecionada)'}>} valorServicoObra), '0,00%')",
+          "qLabel": "Realizado (medição)",
+          "type": "measure"
+        }
+      ]
+    },
+    "photoColumns": [
+      {
+        "qFieldDefs": [
+          "urlFoto"
+        ],
+        "qFieldLabels": [
+          "URL da foto"
+        ],
+        "sortingPriority": 2,
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "localFoto"
+        ],
+        "qFieldLabels": [
+          "Local da foto"
+        ],
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "[dataFotoDiarioObra]"
+        ],
+        "qFieldLabels": [
+          "Data da foto"
+        ],
+        "type": "dimension",
+        "sortingPriority": 0,
+        "qSortCriterias": [
+          {
+            "qSortByState": 0,
+            "qSortByFrequency": 0,
+            "qSortByNumeric": 0,
+            "qSortByAscii": 0,
+            "qSortByLoadOrder": 1,
+            "qSortByExpression": 0,
+            "qExpression": {
+              "qv": ""
+            },
+            "qSortByGreyness": 0
+          }
+        ]
+      },
+      {
+        "qFieldDefs": [
+          "nmServicoFoto"
+        ],
+        "qFieldLabels": [
+          "Serviço da foto"
+        ],
+        "type": "dimension"
+      },
+      {
+        "qDef": "Sum({<_skObra={$(vObraSelecionada)}>}1)",
+        "qLabel": "Filtro obra",
+        "type": "measure"
+      }
+    ]
+  },
+  "sidebar": {
+    "columns": [
+      {
+        "qFieldDefs": [
+          "={<cdTipoObra = {15,30,33,35,37,41,45}>} [_skObra]"
+        ],
+        "qFieldLabels": [
+          "identificador único da obra"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "Contrato"
+        ],
+        "qFieldLabels": [
+          "Contrato"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qFieldDefs": [
+          "[Tipo da obra]"
+        ],
+        "qFieldLabels": [
+          "Tipo"
+        ],
+        "qNullSuppression": true,
+        "type": "dimension"
+      },
+      {
+        "qDef": "FirstSortedValue(DISTINCT urlFoto, -dataFotoDiarioObra)",
+        "qLabel": "Foto",
+        "type": "measure"
+      },
+      {
+        "qFieldDefs": [
+          "cdLote"
+        ],
+        "qFieldLabels": [
+          "Código da obra"
+        ],
+        "type": "dimension"
+      },
+      {
+        "qDef": "num(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao) / Sum(valorServicoObra), '#.##0,00%')",
+        "qLabel": "Execução",
+        "type": "measure"
+      },
+      {
+        "qFieldDefs": [
+          "[Local da obra]"
+        ],
+        "qFieldLabels": [
+          "Local da obra"
+        ],
+        "qNullSuppression": false,
+        "type": "dimension"
+      },
+      {
+        "qDef": "Date([Data fim execução da obra])",
+        "qLabel": "Data fim execução da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Sum(valorServicoObra)",
+        "qLabel": "Valor da obra",
+        "type": "measure"
+      },
+      {
+        "qDef": "Only([Descrição da obra])",
+        "qLabel": "Descrição da obra",
+        "type": "measure"
+      }
+    ],
+    "filterColumns": [
+      {
+        "qFieldDefs": [
+          "[Tipo da obra]"
+        ],
+        "qFieldLabels": [
+          "Tipo da obra"
+        ],
+        "label": "Tipos de obra"
+      }
+    ]
+  },
+  "kpis": [
+    {
+      "label": "Quantidade de Obras",
+      "title": "='Quantidade de obras'",
+      "expression": "num(count(distinct {<cdTipoObra = {15, 30, 33, 35, 37, 41, 45}>} [_skObra]), '#.##0')",
+      "extraAttributes": {
+        "icon": "='ellipse-boxes'"
+      }
+    },
+    {
+      "label": "Valor da(s) obra(s)",
+      "title": "Valor da(s) obra(s)",
+      "expression": "'R$' & num(Sum(valorServicoObra), '#.##0,00')",
+      "extraAttributes": {
+        "icon": "='ellipse-coins'"
+      }
+    },
+    {
+      "label": "Medido (PI + Acréscimo e Desconto)",
+      "title": "Medido (PI + Acréscimo e Desconto)",
+      "expression": "'R$' & num(Sum({<[_skObra] = P(_skObra), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao), '#.##0,00')",
+      "extraAttributes": {
+        "icon": "='ellipse-layers'"
+      }
+    },
+    {
+      "label": "% Execução",
+      "title": "='% Execução'",
+      "expression": "num(Sum({<[_skObra] = P(_skObra), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao)/Sum(valorServicoObra), '0,00%')",
+      "extraAttributes": {
+        "icon": "='ellipse-percent-diamond'"
+      }
+    },
+    {
+      "label": "Diferença previsto x realizado (p.p.)",
+      "title": "Diferença previsto x realizado (p.p.)",
+      "expression": "num(Round((Sum({<[_skObra] = P(_skObra), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao)/Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra))-((Sum({<[_skObra] = P(_skObra), _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma)/Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra))), 0.0001) * 100, '#.##0,00')",
+      "extraAttributes": {
+        "icon": "='ellipse-blocks'"
+      }
+    },
+    {
+      "label": "Medido (PI + R + Acréscimo e Desconto)",
+      "title": "Medido (PI + R + Acréscimo e Desconto)",
+      "expression": "'R$' & num(Sum({<[_skObra] = P(_skObra), [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao), '#.##0,00')",
+      "extraAttributes": {
+        "icon": "='ellipse-layers'"
+      }
+    }
+  ]
+}

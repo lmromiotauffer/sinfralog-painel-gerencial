@@ -1,0 +1,121 @@
+{
+  "table": {
+    "columns": [
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "Contrato"
+        ],
+        "qFieldLabels": [
+          "Contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Descrição do contrato]"
+        ],
+        "qFieldLabels": [
+          "Descrição do contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=Credor"
+        ],
+        "qFieldLabels": [
+          "Credor"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Tipo do contrato]"
+        ],
+        "qFieldLabels": [
+          "Tipo do contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Classificação do contrato]"
+        ],
+        "qFieldLabels": [
+          "Classificação do contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Situação atual do contrato]"
+        ],
+        "qFieldLabels": [
+          "Situação atual do contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Sigla adjunta]"
+        ],
+        "qFieldLabels": [
+          "Adjunta"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Sigla órgão setor]"
+        ],
+        "qFieldLabels": [
+          "Setor"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {\"1\"}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo), 'R$#.##0,00;-R$#.##0,00')",
+        "qLabel": "Valor atual (inicial + aditivos)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao), 'R$#.##0,00;-R$#.##0,00')",
+        "qLabel": "Medido (PI)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {\"RD\", \"CR\", \"RP\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao), 'R$#.##0,00;-R$#.##0,00')",
+        "qLabel": "Reajustamento (R + Acréscimo e Desconto)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num((sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {\"1\"}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo)) - Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao), 'R$#.##0,00;-R$#.##0,00')",
+        "qLabel": "Saldo contratual"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num((sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorLiquidacao) - sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorEstornoLiquidacao)), 'R$#.##0,00;-R$#.##0,00')",
+        "qLabel": "Valor liquidado"
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Data fim vigência do contrato]"
+        ],
+        "qFieldLabels": [
+          "Data fim de vigência"
+        ],
+        "qNullSuppression": false
+      }
+    ]
+  }
+}

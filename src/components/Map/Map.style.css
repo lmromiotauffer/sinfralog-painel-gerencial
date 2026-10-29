@@ -1,0 +1,491 @@
+/* Filtro para converter CARTO Dark Matter para tom azul escuro #18212E */
+[data-map-layer="dark"] .leaflet-tile-pane {
+  filter: sepia(100%) hue-rotate(180deg) saturate(200%) brightness(1.4)
+    contrast(1.2);
+}
+
+/* Filtro para deixar CARTO Light menos brilhante e mais suave aos olhos */
+[data-map-layer="light"] .leaflet-tile-pane {
+  filter: brightness(0.88) contrast(1.15) saturate(0.9);
+}
+
+/* Background color for loading tiles based on map mode; satellite follows app theme */
+[data-map-layer="dark"] .leaflet-container,
+:root.dark [data-map-layer="satellite"] .leaflet-container {
+  background-color: var(--palette-dark-background);
+}
+
+[data-map-layer="light"] .leaflet-container,
+[data-map-layer="street"] .leaflet-container,
+:root:not(.dark) [data-map-layer="satellite"] .leaflet-container {
+  background-color: #ffffff;
+}
+
+/* Ao entrar nas bolhas, a camada sem rótulos esmaece e os nomes de cidade de baixo voltam aos poucos
+   (CamadaSemRotulos em MapContent; o Leaflet grava a opacidade inline e a transição a acompanha) */
+.camada-sem-rotulos {
+  transition: opacity var(--duracao-longa) var(--ease-cor);
+}
+
+/* Remove o grid/borda entre os tiles do mapa */
+.leaflet-tile {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Street mode (light map) - fundo claro, fonte escura */
+.custom-marker-cluster {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.64) 100%
+  );
+  border: none;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+  color: var(--colors-category-foreground);
+}
+
+.custom-marker-cluster span {
+  line-height: 1;
+  display: block;
+}
+
+.custom-marker-cluster:hover {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  scale: 1.05; /* scale, não transform: o transform inline do Leaflet venceria */
+}
+
+/* Dark mode (Mapa) - fundo claro, fonte clara */
+[data-map-layer="dark"] .custom-marker-cluster {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(209, 215, 212, 0.55) 0%,
+    rgba(209, 215, 212, 0) 100%
+  );
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-map-layer="dark"] .custom-marker-cluster:hover {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(209, 215, 212, 0.7) 0%,
+    rgba(209, 215, 212, 0) 100%
+  );
+}
+
+/* Satellite mode - fundo escuro bem demarcado */
+[data-map-layer="satellite"] .custom-marker-cluster {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(15, 23, 42, 0.9) 0%,
+    rgba(15, 23, 42, 0.4) 70%,
+    rgba(15, 23, 42, 0) 100%
+  );
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+[data-map-layer="satellite"] .custom-marker-cluster:hover {
+  background: radial-gradient(
+    76.6% 76.6% at 50% 50%,
+    rgba(15, 23, 42, 0.95) 0%,
+    rgba(15, 23, 42, 0.5) 70%,
+    rgba(15, 23, 42, 0) 100%
+  );
+}
+
+.photo-tooltip,
+.work-tooltip {
+  padding: 0 !important;
+  border: 1px solid var(--colors-border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+  background-color: var(--colors-popover) !important;
+  color: var(--colors-popover-foreground) !important;
+}
+
+.work-tooltip { overflow: hidden !important; }
+
+.photo-tooltip::before,
+.work-tooltip::before {
+  border-top-color: var(--colors-popover) !important;
+}
+
+.photo-tooltip > div,
+.work-tooltip > div {
+  padding: 0 !important;
+  background-color: var(--colors-popover) !important;
+  border-radius: 8px !important;
+}
+
+.dark :is(.photo-tooltip, .work-tooltip) {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Rótulo do município centrado no polígono do GeoJSON (ideia 1).
+   Usa visibility em vez de display para o Leaflet conseguir medir e centralizar o tooltip
+   (opacity não serve: o Leaflet grava a opacidade do tooltip inline). */
+.leaflet-tooltip.rotulo-municipio {
+  visibility: hidden;
+  z-index: 201; /* acima do SVG dos polígonos (.leaflet-map-pane svg tem z-index 200 no leaflet.css) */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+  /* Rótulo que passa a caber ou deixa de caber entra e sai esmaecendo; a visibility só cai no fim da saída (ver abaixo) */
+  transition: visibility 0s var(--duracao-curta);
+  font-family: var(--font-condensada);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(30, 41, 59, 0.75);
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 3px rgba(255, 255, 255, 0.9);
+}
+
+.leaflet-tooltip.rotulo-municipio::before {
+  display: none;
+}
+
+/* Nome do município: só onde cabe no bloco e não colide (classe .rotulo-cabe vem de CamadaMunicipios) */
+.leaflet-tooltip.rotulo-municipio.rotulo-cabe {
+  visibility: visible;
+}
+
+/* O encaixe acima é refeito a cada zoom, pan e filtro: rótulo que passa a caber ou deixa de caber entra e sai
+   esmaecendo, em vez de piscar. A opacidade vai nos filhos (a do tooltip o Leaflet grava inline) e a visibility
+   só cai no fim da saída. Opacidade não entra no getBoundingClientRect do encaixe. */
+.leaflet-tooltip.rotulo-municipio > * {
+  opacity: 0;
+  transition: opacity var(--duracao-curta) var(--ease-saida);
+}
+
+.leaflet-tooltip.rotulo-municipio:is(.rotulo-cabe, .rotulo-ativo) {
+  transition-delay: 0s;
+}
+
+.leaflet-tooltip.rotulo-municipio:is(.rotulo-cabe, .rotulo-ativo) > * {
+  opacity: 1;
+  transition: opacity var(--duracao-media) var(--ease-cor);
+}
+
+.leaflet-tooltip.rotulo-municipio .bloco-nome {
+  display: block;
+  text-align: center;
+  line-height: 1.15;
+}
+
+/* Círculo com a quantidade: só existe no coroplético */
+.leaflet-tooltip.rotulo-municipio .bloco-cluster {
+  display: none;
+}
+
+/* Modo coroplético (zoom abaixo de ZOOM_MIN_MUNICIPIOS): o CSS vence os atributos SVG do Leaflet.
+   Preenchimento por quantidade de obras vem do style da camada; aqui só o contorno, o hover e o que some. */
+.municipio {
+  fill: var(--colors-brand-blue);
+  transition:
+    fill-opacity var(--duracao-longa) var(--ease-cor),
+    stroke var(--duracao-longa) var(--ease-cor),
+    stroke-opacity var(--duracao-curta) var(--ease-cor),
+    stroke-width var(--duracao-curta) var(--ease-cor);
+}
+
+[data-map-layer="dark"] .municipio,
+[data-map-layer="satellite"] .municipio {
+  fill: var(--colors-blue-soft);
+}
+
+.mostra-municipios .municipio {
+  fill-opacity: 0;
+}
+
+.leaflet-container:not(.mostra-municipios) .municipio {
+  stroke: #ffffff;
+  stroke-opacity: 0.7;
+}
+
+[data-map-layer="light"] .leaflet-container:not(.mostra-municipios) .municipio,
+[data-map-layer="street"] .leaflet-container:not(.mostra-municipios) .municipio {
+  stroke: var(--palette-light-muted);
+}
+
+.leaflet-container:not(.mostra-municipios) .municipio:hover {
+  stroke-width: 2.5;
+  stroke-opacity: 1;
+}
+
+/* Troca de visão em ZOOM_MIN_MUNICIPIOS: bolhas e clusters cedem lugar ao coroplético esmaecendo, e a bolha
+   encolhe para dentro do município ao sair e cresce dele ao entrar. Antes era display: none, um corte seco.
+   - filter: opacity(), não opacity: o MarkerCluster grava opacity inline nas animações dele. Em repouso fica
+     filter: none, sem camada de composição a mais em centenas de ícones.
+   - O scale vai no SVG, não no ícone: ColisaoLegendas mede o ícone no mesmo zoomend.
+   - Duração e curva por variável: a transição é a do estado de destino (entrada longa e suave, saída curta), e as
+     regras de animação do Leaflet e do MarkerCluster abaixo reaproveitam as mesmas variáveis. */
+.custom-marker,
+.custom-marker-cluster {
+  --troca-duracao: var(--duracao-longa);
+  --troca-curva: var(--ease-suave);
+  --troca-atraso: 0s;
+}
+
+.leaflet-container:not(.mostra-municipios) :is(.custom-marker, .custom-marker-cluster) {
+  --troca-duracao: var(--duracao-media);
+  --troca-curva: var(--ease-saida);
+  --troca-atraso: var(--duracao-media);
+  pointer-events: none; /* visibility só cai no fim do esmaecer: sem isto, um toque no meio abria a obra */
+  visibility: hidden;
+  filter: opacity(0);
+}
+
+.custom-marker {
+  transition:
+    filter var(--troca-duracao) var(--troca-curva),
+    visibility 0s var(--troca-atraso);
+}
+
+/* Sem transform: o Leaflet posiciona o cluster por transform inline, e o antigo "transition: all 0.3s ease"
+   fazia cada cluster deslizar atrás do zoom. Deslocamento é do leaflet.css e do MarkerCluster.css. */
+.custom-marker-cluster {
+  transition:
+    background var(--duracao-curta) var(--ease-cor),
+    scale var(--duracao-curta) var(--ease-cor),
+    filter var(--troca-duracao) var(--troca-curva),
+    visibility 0s var(--troca-atraso);
+}
+
+.custom-marker > div > svg {
+  transition: scale var(--troca-duracao) var(--troca-curva);
+}
+
+.leaflet-container:not(.mostra-municipios) .custom-marker > div > svg {
+  scale: 0.6;
+}
+
+/* Mesma especificidade das regras de leaflet.css e MarkerCluster.css, declaradas depois: mantém o deslocamento
+   delas e soma a troca de visão, que senão seria cortada quando a troca cai durante o zoom ou a animação do cluster */
+.leaflet-zoom-anim :is(.custom-marker, .custom-marker-cluster) {
+  transition:
+    transform 0.25s cubic-bezier(0, 0, 0.25, 1),
+    filter var(--troca-duracao) var(--troca-curva),
+    visibility 0s var(--troca-atraso);
+}
+
+.leaflet-cluster-anim :is(.custom-marker, .custom-marker-cluster) {
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s ease-in,
+    filter var(--troca-duracao) var(--troca-curva),
+    visibility 0s var(--troca-atraso);
+}
+
+/* Contagem por município e nome no hover: chegam esmaecendo. Só opacidade: CamadaMunicipios mede o rótulo
+   logo depois de reescrevê-lo, e um scale entraria na medida */
+@keyframes surgir-rotulo {
+  from {
+    opacity: 0;
+  }
+}
+
+.leaflet-container:not(.mostra-municipios) .rotulo-municipio .bloco-cluster {
+  animation: surgir-rotulo var(--duracao-longa) var(--ease-cor);
+}
+
+.leaflet-container:not(.mostra-municipios) .rotulo-municipio.sem-nome.rotulo-ativo .bloco-nome {
+  animation: surgir-rotulo var(--duracao-curta) var(--ease-cor);
+}
+
+/* Rótulo no coroplético: mesma linguagem do modo de bolhas. Círculo no formato do cluster com a quantidade
+   (--tamanho vem de CamadaMunicipios e escala com a quantidade) e o nome num cartão igual à legenda das bolhas.
+   Círculo e cartão dividem o mesmo fundo quase opaco: o gradiente translúcido do cluster foi feito para ficar
+   sobre tiles e, sobre o preenchimento azul do polígono, vira um cinza sem contraste (no escuro some de vez).
+   O cartão é a mesma regra de .custom-marker .legenda-obra.
+   O que só aparece no hover (tipo por extenso, e o nome no fallback só-círculo) fica fora do fluxo, abaixo do
+   que já estava: o Leaflet posiciona o tooltip pela largura medida no setContent, e o que crescesse no fluxo
+   empurraria o círculo para a direita, para fora do polígono. */
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-shadow: none;
+}
+
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio .bloco-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--tamanho);
+  height: var(--tamanho);
+  border-radius: 50%;
+  border: 2px solid var(--colors-brand-blue); /* azul institucional, o mesmo do preenchimento: só a quantidade importa aqui */
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--colors-category-foreground);
+  font-family: var(--font-sans);
+  font-size: calc(var(--tamanho) * 0.42);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Cartão do nome no coroplético e da legenda das bolhas */
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio .bloco-nome,
+.custom-marker .legenda-obra {
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(var(--blur-custom, 10px)); /* mesmo blur da sidebar */
+  color: var(--colors-category-foreground);
+}
+
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio .bloco-nome {
+  position: relative;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* Só o círculo fica à mostra; o nome aparece no hover, abaixo dele */
+.leaflet-container:not(.mostra-municipios)
+  .leaflet-tooltip.rotulo-municipio.sem-nome:not(.rotulo-ativo)
+  .bloco-nome {
+  display: none;
+}
+
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio.sem-nome.rotulo-ativo .bloco-nome {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+}
+
+/* Município sem obras: sem círculo, o nome fica centrado no polo */
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio.sem-nome.rotulo-ativo .bloco-nome:first-child {
+  top: 50%;
+  margin-top: 0;
+  transform: translate(-50%, -50%);
+}
+
+/* Hover: mostra o rótulo mesmo onde não coube, por cima dos rótulos vizinhos */
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio.rotulo-ativo {
+  visibility: visible;
+  z-index: 202;
+}
+
+[data-map-layer="dark"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio :is(.bloco-cluster, .bloco-nome),
+[data-map-layer="satellite"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio :is(.bloco-cluster, .bloco-nome),
+[data-map-layer="dark"] .custom-marker .legenda-obra,
+[data-map-layer="satellite"] .custom-marker .legenda-obra {
+  background: rgba(15, 23, 42, 0.8);
+  color: #ffffff;
+  border-color: var(--colors-blue-soft);
+}
+
+/* Legenda de tipos só faz sentido com as bolhas; no coroplético a cor não diferencia nada.
+   O mapa vai por portal para o body, então a página não sabe o modo: o :has lê a classe do container.
+   Recolhe a altura em vez de display: none, para o seletor de fundo logo acima descer junto, sem salto. */
+.legenda-tipos {
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--duracao-longa) var(--ease-suave),
+    opacity var(--duracao-media) var(--ease-cor),
+    visibility 0s;
+}
+
+body:has(.leaflet-container:not(.mostra-municipios)) .legenda-tipos {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s, 0s, var(--duracao-longa);
+}
+
+/* 0fr não passa do padding e da borda do cartão: recolhe os dois junto, senão sobravam 18px */
+.legenda-tipos > ul {
+  transition:
+    padding var(--duracao-longa) var(--ease-suave),
+    border-width var(--duracao-longa) var(--ease-suave);
+}
+
+body:has(.leaflet-container:not(.mostra-municipios)) .legenda-tipos > ul {
+  padding-block: 0;
+  border-block-width: 0;
+}
+
+[data-map-layer="dark"] .leaflet-tooltip.rotulo-municipio,
+[data-map-layer="satellite"] .leaflet-tooltip.rotulo-municipio {
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow:
+    0 0 3px rgba(0, 0, 0, 0.9),
+    0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Legenda abaixo da bolha: contrato + município. Mesmo contraste dos clusters por camada.
+   visibility (não display) para não afetar o layout do ícone; o Leaflet posiciona o ícone pelo iconAnchor. */
+.custom-marker .legenda-obra {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px; /* acentos das maiúsculas do município sobem além da linha */
+  margin-top: 2px;
+  font-family: var(--font-condensada);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.mostra-municipios .custom-marker .legenda-obra {
+  visibility: visible;
+}
+
+.custom-marker .legenda-obra strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.custom-marker .legenda-obra small {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Resolução de colisão das legendas (ColisaoLegendas): acima da bolha, ou oculta */
+.custom-marker .legenda-obra.legenda-acima {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.custom-marker .legenda-obra.legenda-oculta {
+  visibility: hidden;
+}

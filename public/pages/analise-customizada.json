@@ -1,0 +1,170 @@
+[
+  {
+    "id": "Contrato",
+    "qFieldDefs": ["Contrato"],
+    "qFieldLabels": ["Contrato"],
+    "type": "dimension"
+  },
+  {
+    "id": "Descrição do contrato",
+    "qFieldDefs": ["Descrição do contrato"],
+    "qFieldLabels": ["Descrição do contrato"],
+    "type": "dimension"
+  },
+  {
+    "id": "Situação do Contrato",
+    "qFieldDefs": ["Situação atual do contrato"],
+    "qFieldLabels": ["Situação do Contrato"],
+    "type": "dimension"
+  },
+  {
+    "id": "Tipo do contrato",
+    "qFieldDefs": ["Tipo do contrato"],
+    "qFieldLabels": ["Tipo do contrato"],
+    "type": "dimension"
+  },
+  {
+    "id": "Classificação do contrato",
+    "qFieldDefs": ["Classificação do contrato"],
+    "qFieldLabels": ["Classificação do contrato"],
+    "type": "dimension"
+  },
+  {
+    "id": "Data fim de vigência",
+    "qFieldDefs": ["=[Data fim vigência do contrato]"],
+    "qFieldLabels": ["Data fim de vigência"],
+    "type": "dimension"
+  },
+  {
+    "id": "Credor",
+    "qFieldDefs": ["Credor"],
+    "qFieldLabels": ["Credor"],
+    "type": "dimension"
+  },
+  {
+    "id": "Adjunta",
+    "qFieldDefs": ["Sigla adjunta"],
+    "qFieldLabels": ["Adjunta"],
+    "type": "dimension"
+  },
+  {
+    "id": "Setor",
+    "qFieldDefs": ["Sigla órgão setor"],
+    "qFieldLabels": ["Setor"],
+    "type": "dimension"
+  },
+  {
+    "id": "Código da obra",
+    "qFieldDefs": ["cdLote"],
+    "qFieldLabels": ["Código da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Descrição da obra",
+    "qFieldDefs": ["Descrição da obra"],
+    "qFieldLabels": ["Descrição da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Situação atual da obra",
+    "qFieldDefs": ["Situação atual da obra"],
+    "qFieldLabels": ["Situação atual da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Tipo da obra",
+    "qFieldDefs": ["Tipo da obra"],
+    "qFieldLabels": ["Tipo da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Classificação da obra",
+    "qFieldDefs": ["Classificação da obra"],
+    "qFieldLabels": ["Classificação da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Extensão",
+    "qFieldDefs": ["qtExtensaoObra"],
+    "qFieldLabels": ["Extensão"],
+    "type": "dimension"
+  },
+  {
+    "id": "Unidade extensão",
+    "qFieldDefs": ["Unidade extensão da obra"],
+    "qFieldLabels": ["Unidade extensão"],
+    "type": "dimension"
+  },
+  {
+    "id": "Data fim execução da obra",
+    "qFieldDefs": ["=Date([Data fim execução da obra])"],
+    "qFieldLabels": ["Data fim execução da obra"],
+    "type": "dimension"
+  },
+  {
+    "id": "Valor atual (inicial + aditivos)",
+    "qDef": "if((sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {'1'}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo)) = 0, '-', Num(sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {'1'}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo), 'R$ #.##0,00'))",
+    "qLabel": "Valor atual Contrato (inicial + aditivos)",
+    "type": "measure"
+  },
+  {
+    "id": "Valor liquidado",
+    "qDef": "if((sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorLiquidacao) - sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorEstornoLiquidacao)) = 0, '-', Num(sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorLiquidacao) - sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorEstornoLiquidacao), 'R$ #.##0,00'))",
+    "qLabel": "Valor liquidado",
+    "type": "measure"
+  },
+  {
+    "id": "Saldo contratual",
+    "qDef": "if(((sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {'1'}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo)) - Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao)) = 0, '-', Num((sum(vlInicialContrato) + Sum({<urlFoto=, [cdTipoAditivo] = {'1'}, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato)>} valorAditivo)) - Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao), 'R$ #.##0,00'))",
+    "qLabel": "Saldo contratual",
+    "type": "measure"
+  },
+  {
+    "id": "Valor total cronograma (sem reaj.)",
+    "qDef": "if(Sum({<[_skObra] = P(_skObra), urlFoto=, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}>} valorCronograma) = 0, '-', Num(Sum({<[_skObra] = P(_skObra), urlFoto=, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}>} valorCronograma), 'R$ #.##0,00'))",
+    "qLabel": "Valor total cronograma (sem reaj.)",
+    "type": "measure"
+  },
+  {
+    "id": "Valor da obra",
+    "qDef": "if(Sum(valorServicoObra) = 0, '-', Num(Sum(valorServicoObra), 'R$ #.##0,00'))",
+    "qLabel": "Valor da obra",
+    "type": "measure"
+  },
+  {
+    "id": "Medido (PI)",
+    "qDef": "if(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao) = 0, '-', Num(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao), 'R$ #.##0,00'))",
+    "qLabel": "Medido (PI)",
+    "type": "measure"
+  },
+  {
+    "id": "Reajustamento (R + Acréscimo e Desconto)",
+    "qDef": "if(Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {'RD', 'CR', 'RP'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao) = 0, '-', Num(Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {'RD', 'CR', 'RP'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}>} valorMedicao), 'R$ #.##0,00'))",
+    "qLabel": "Reajustamento (R + Acréscimo e Desconto)",
+    "type": "measure"
+  },
+  {
+    "id": "Medido (PI + R + Acréscimo e Desconto)",
+    "qDef": "if(Sum({<[_skObra] = P(_skObra), [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao) = 0, '-', Num(Sum({<[_skObra] = P(_skObra), [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao), 'R$ #.##0,00'))",
+    "qLabel": "Medido (PI + R + Acréscimo e Desconto)",
+    "type": "measure"
+  },
+  {
+    "id": "% Execução",
+    "qDef": "if(Sum(valorServicoObra) = 0, '-', Num(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao) / Sum(valorServicoObra) * 100, '#.##0,00') & '%')",
+    "qLabel": "% Execução",
+    "type": "measure"
+  },
+  {
+    "id": "% Execução esperada",
+    "qDef": "if(Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra) = 0, '-', Num(Sum({<[_skObra] = P(_skObra), _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra) * 100, '#.##0,00') & '%')",
+    "qLabel": "% Execução esperada",
+    "type": "measure"
+  },
+  {
+    "id": "Diferença previsto x realizado (p.p.)",
+    "qDef": "if(Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra) = 0, '-', Num(Round((Sum({<[_skObra] = P(_skObra), [tpValor] = {'PI'}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {'S'}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra)) - (Sum({<[_skObra] = P(_skObra), _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra)), 0.0001) * 100, '#.##0,00;-#.##0,00'))",
+    "qLabel": "Diferença previsto x realizado (p.p.)",
+    "type": "measure"
+  }
+]

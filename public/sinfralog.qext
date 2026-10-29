@@ -1,0 +1,15 @@
+{
+	"type": "mashup",
+	"name": "SINFRALOG - Painel de Contratos e Obras",
+	"description": "",
+	"preview": "",
+	"version": "1.3",
+	"author": "Cluster",
+	"homepage": "",
+	"keywords": "qlik-sense, visualization, mashup",
+	"license": "",
+	"repository": "",
+	"dependencies": {
+		"qlik-sense": ">=3.0.x"
+	}
+}

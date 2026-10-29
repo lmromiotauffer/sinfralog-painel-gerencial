@@ -1,0 +1,157 @@
+{
+  "table": {
+    "columns": [
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=Contrato"
+        ],
+        "qFieldLabels": [
+          "Contrato"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=cdLote"
+        ],
+        "qFieldLabels": [
+          "Código da obra"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Descrição da obra]"
+        ],
+        "qFieldLabels": [
+          "Descrição da obra"
+        ],
+        "qNullSuppression": true
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Tipo da obra]"
+        ],
+        "qFieldLabels": [
+          "Tipo da obra"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Classificação da obra]"
+        ],
+        "qFieldLabels": [
+          "Classificação da obra"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Situação atual da obra]"
+        ],
+        "qFieldLabels": [
+          "Situação atual da obra"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "Sigla adjunta"
+        ],
+        "qFieldLabels": [
+          "Adjunta"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Sigla órgão setor]"
+        ],
+        "qFieldLabels": [
+          "Setor"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "alinhamento": "direita",
+        "qFieldDefs": [
+          "qtExtensaoObra"
+        ],
+        "qFieldLabels": [
+          "Extensão"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=[Unidade extensão da obra]"
+        ],
+        "qFieldLabels": [
+          "Unidade extensão"
+        ],
+        "qNullSuppression": false
+      },
+      {
+        "type": "measure",
+        "qDef": "Money(Sum(valorServicoObra))",
+        "qLabel": "Valor da obra"
+      },
+      {
+        "type": "measure",
+        "qDef": "Money(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao))",
+        "qLabel": "Medido (PI)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Money(Sum({<urlFoto=, [Local da obra] =, [Município] =, [Descrição da obra] =, [Tipo da obra] =, [Classificação da obra] =, [Sigla da rodovia] =, [_skContrato] = P(_skContrato), [tpValor] = {\"RD\", \"CR\", \"RP\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao))",
+        "qLabel": "Reajustamento"
+      },
+      {
+        "type": "measure",
+        "qDef": "Money(Sum({<[_skObra] = P(_skObra), [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao))",
+        "qLabel": "Medido (PI + R)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Money(Sum({<[_skObra] = P(_skObra), urlFoto=, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}>} valorCronograma))",
+        "qLabel": "Valor total cronograma (sem reaj.)"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(Sum({<[_skObra] = P(_skObra), urlFoto=, [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}>} valorMedicao) / Sum(valorServicoObra), '#.##0,00%')",
+        "qLabel": "% Execução"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(Sum({<[_skObra] = P(_skObra), _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra), '#.##0,00%')",
+        "qLabel": "% Execução esperada"
+      },
+      {
+        "type": "measure",
+        "qDef": "Num(Round((Sum({<[_skObra] = P(_skObra), [tpValor] = {\"PI\"}, [cdTipoCalculoMedicao] = {1,2,3}, [flMedicaoAprovada] = {\"S\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorMedicao) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra)) - (Sum({<[_skObra] = P(_skObra), _skTempo={\"<$(=Date(MonthStart(Today()), 'YYYYMMDD'))\"}, cdTipoObra = {15, 30, 33, 35, 37, 41, 45}, urlFoto=>} valorCronograma) / Sum({<[_skObra] = P(_skObra), urlFoto=>} valorServicoObra)), 0.0001) * 100, '#.##0,00')",
+        "qLabel": "Diferença Previsto x Realizado"
+      },
+      {
+        "type": "dimension",
+        "qFieldDefs": [
+          "=Date([Data fim execução da obra], 'DD/MM/YYYY')"
+        ],
+        "qFieldLabels": [
+          "Data fim execução da obra"
+        ],
+        "qNullSuppression": false
+      }
+    ]
+  }
+}
