@@ -62,8 +62,17 @@ export const MapEffect = ({ setIsFocused, setCoropletico, works }: MapEffectProp
     };
   }, [map, setCoropletico]);
 
+  // Destino do último voo: os detalhes (trechos, rodovia) chegam depois e trocam o objeto da obra, o que
+  // reiniciava o voo no meio do caminho (até 3 flyTo por clique). Só voa de novo se o destino mudou.
+  const ultimoDestinoRef = useRef("");
+
   // --- Efeito 1: Seleção de Obra ou Ponto de Foco ---
   useEffect(() => {
+    const voarSeMudou = (destino: string, voo: () => void) => {
+      if (ultimoDestinoRef.current === destino) return;
+      ultimoDestinoRef.current = destino;
+      voo();
+    };
     // Centraliza no ponto deslocado 20% da largura, para o card da obra não cobri-lo
     const voarDeslocado = ({ lat, lng }: { lat: number; lng: number }) => {
       const centro = map.project([lat, lng], ZOOM_MAX_ENQUADRAMENTO).add([map.getSize().x * 0.2, 0]);
@@ -72,33 +81,35 @@ export const MapEffect = ({ setIsFocused, setCoropletico, works }: MapEffectProp
 
     // Caso 1: Navegação para um ponto específico (ex: clique em foto)
     if (mapFocusPoint) {
-      voarDeslocado(mapFocusPoint);
+      voarSeMudou(`${selectedWork?.id}|${mapFocusPoint.lat},${mapFocusPoint.lng}`, () => voarDeslocado(mapFocusPoint));
       setIsFocused(true);
       return;
     }
 
     // Caso 2: Obra selecionada
     if (selectedWork) {
-      setIsFocused(false);
-
       // Com trechos, enquadra todos; senão, o ponto único
-      const bounds = L.latLngBounds([...(selectedWork.routes ?? []), ...(selectedWork.geoTrechos ?? [])].flat());
-      if (bounds.isValid()) {
-        voarParaLimites(
-          map,
-          bounds.pad(0.1),
-          {
-            paddingTopLeft: [20, 20],
-            paddingBottomRight: [map.getSize().x * 0.35 + 20, 20],
-            maxZoom: ZOOM_MAX_ENQUADRAMENTO,
-          },
-          reduzido,
-        );
-      } else if (selectedWork.location) {
-        voarDeslocado(selectedWork.location);
-      }
+      const trechos = [...(selectedWork.routes ?? []), ...(selectedWork.geoTrechos ?? [])];
+      voarSeMudou(`${selectedWork.id}|${trechos.length}`, () => {
+        const bounds = L.latLngBounds(trechos.flat());
+        if (bounds.isValid()) {
+          voarParaLimites(
+            map,
+            bounds.pad(0.1),
+            {
+              paddingTopLeft: [20, 20],
+              paddingBottomRight: [map.getSize().x * 0.35 + 20, 20],
+              maxZoom: ZOOM_MAX_ENQUADRAMENTO,
+            },
+            reduzido,
+          );
+        } else if (selectedWork.location) {
+          voarDeslocado(selectedWork.location);
+        }
+      });
       setIsFocused(true);
     } else {
+      ultimoDestinoRef.current = "";
       setIsFocused(false);
     }
   }, [selectedWork, map, setIsFocused, mapFocusPoint, reduzido]);

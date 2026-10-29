@@ -22,7 +22,8 @@ export const FilterPane: React.FC<FilterPaneProps> = ({ filters, selections }) =
   const estreita = useMobileScreen(1280);
   // Abaixo de 1740px os 7 + botão "Filtros" não cabem (medido: 1386px numa linha de 1390 em 1720×900)
   const media = useMobileScreen(1740);
-  const visiveis = estreita ? 3 : compacta ? 4 : media ? 6 : filters.length;
+  // Teto de 7: a lista vem do Qlik e pode crescer (com 11 o último saía cortado e o botão sumia)
+  const visiveis = estreita ? 3 : compacta ? 4 : media ? 6 : 7;
   // Filtros da barra; o restante vai para "Mais filtros" (sem repetir os visíveis)
   const displayFilters = filters.slice(0, visiveis);
   const moreFilters = filters.slice(visiveis);

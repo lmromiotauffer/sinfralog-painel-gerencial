@@ -66,7 +66,8 @@
     rgba(255, 255, 255, 1) 0%,
     rgba(255, 255, 255, 0.85) 100%
   );
-  scale: 1.05; /* scale, não transform: o transform inline do Leaflet venceria */
+  /* Sem scale: ele é aplicado antes do translate3d inline do Leaflet e escala também a posição,
+     então o cluster saltava dezenas de px no hover, saía de baixo do cursor e voltava (flicker) */
 }
 
 /* Dark mode (Mapa) - fundo claro, fonte clara */
@@ -202,38 +203,71 @@
 }
 
 /* Modo coroplético (zoom abaixo de ZOOM_MIN_MUNICIPIOS): o CSS vence os atributos SVG do Leaflet.
-   Preenchimento por quantidade de obras vem do style da camada; aqui só o contorno, o hover e o que some. */
+   Faixa de quantidade (.nivel-0 a .nivel-5) vem do style da camada; a cor de cada faixa depende do fundo do mapa.
+   Contorno na cor do fundo: separa os municípios sem acender a malha. */
+[data-map-layer] {
+  --nivel-0: var(--coropletico-claro-0);
+  --nivel-1: var(--coropletico-claro-1);
+  --nivel-2: var(--coropletico-claro-2);
+  --nivel-3: var(--coropletico-claro-3);
+  --nivel-4: var(--coropletico-claro-4);
+  --nivel-5: var(--coropletico-claro-5);
+  --contorno-municipio: var(--palette-light-surface);
+  --contorno-municipio-ativo: var(--palette-light-text);
+  /* Número nas faixas 1–3 e 4–5 */
+  --numero-faixa-baixa: var(--coropletico-texto-escuro);
+  --numero-faixa-alta: var(--coropletico-texto-claro);
+}
+
+[data-map-layer="dark"],
+[data-map-layer="satellite"] {
+  --nivel-0: var(--coropletico-escuro-0);
+  --nivel-1: var(--coropletico-escuro-1);
+  --nivel-2: var(--coropletico-escuro-2);
+  --nivel-3: var(--coropletico-escuro-3);
+  --nivel-4: var(--coropletico-escuro-4);
+  --nivel-5: var(--coropletico-escuro-5);
+  --contorno-municipio: var(--palette-dark-background);
+  --contorno-municipio-ativo: var(--palette-dark-text);
+  --numero-faixa-baixa: var(--coropletico-texto-claro);
+  --numero-faixa-alta: var(--coropletico-texto-escuro);
+}
+
 .municipio {
-  fill: var(--colors-brand-blue);
   transition:
+    fill var(--duracao-longa) var(--ease-cor),
     fill-opacity var(--duracao-longa) var(--ease-cor),
     stroke var(--duracao-longa) var(--ease-cor),
     stroke-opacity var(--duracao-curta) var(--ease-cor),
     stroke-width var(--duracao-curta) var(--ease-cor);
 }
 
-[data-map-layer="dark"] .municipio,
-[data-map-layer="satellite"] .municipio {
-  fill: var(--colors-blue-soft);
-}
+.municipio.nivel-0 { fill: var(--nivel-0); }
+.municipio.nivel-1 { fill: var(--nivel-1); }
+.municipio.nivel-2 { fill: var(--nivel-2); }
+.municipio.nivel-3 { fill: var(--nivel-3); }
+.municipio.nivel-4 { fill: var(--nivel-4); }
+.municipio.nivel-5 { fill: var(--nivel-5); }
 
 .mostra-municipios .municipio {
   fill-opacity: 0;
 }
 
 .leaflet-container:not(.mostra-municipios) .municipio {
-  stroke: #ffffff;
-  stroke-opacity: 0.7;
+  stroke: var(--contorno-municipio);
+  stroke-opacity: 1;
+  stroke-width: 0.75;
 }
 
-[data-map-layer="light"] .leaflet-container:not(.mostra-municipios) .municipio,
-[data-map-layer="street"] .leaflet-container:not(.mostra-municipios) .municipio {
-  stroke: var(--palette-light-muted);
+/* Sem obras é ausência, não um degrau da escala: translúcido, o fundo aparece e o município lê como vazio.
+   Só nos fundos claros: no escuro o fundo é mais escuro que o zero e a transparência o deixava mais buraco. */
+:is([data-map-layer="light"], [data-map-layer="street"]) .leaflet-container:not(.mostra-municipios) .municipio.nivel-0 {
+  fill-opacity: 0.35;
 }
 
 .leaflet-container:not(.mostra-municipios) .municipio:hover {
-  stroke-width: 2.5;
-  stroke-opacity: 1;
+  stroke: var(--contorno-municipio-ativo);
+  stroke-width: 2;
 }
 
 /* Troca de visão em ZOOM_MIN_MUNICIPIOS: bolhas e clusters cedem lugar ao coroplético esmaecendo, e a bolha
@@ -270,7 +304,6 @@
 .custom-marker-cluster {
   transition:
     background var(--duracao-curta) var(--ease-cor),
-    scale var(--duracao-curta) var(--ease-cor),
     filter var(--troca-duracao) var(--troca-curva),
     visibility 0s var(--troca-atraso);
 }
@@ -316,11 +349,8 @@
   animation: surgir-rotulo var(--duracao-curta) var(--ease-cor);
 }
 
-/* Rótulo no coroplético: mesma linguagem do modo de bolhas. Círculo no formato do cluster com a quantidade
-   (--tamanho vem de CamadaMunicipios e escala com a quantidade) e o nome num cartão igual à legenda das bolhas.
-   Círculo e cartão dividem o mesmo fundo quase opaco: o gradiente translúcido do cluster foi feito para ficar
-   sobre tiles e, sobre o preenchimento azul do polígono, vira um cinza sem contraste (no escuro some de vez).
-   O cartão é a mesma regra de .custom-marker .legenda-obra.
+/* Rótulo no coroplético: a quantidade solta sobre o município, sem recipiente (a cor do município já diz a faixa;
+   o número dá o valor exato), e o nome no hover num cartão igual à legenda das bolhas (.custom-marker .legenda-obra).
    O que só aparece no hover (tipo por extenso, e o nome no fallback só-círculo) fica fora do fluxo, abaixo do
    que já estava: o Leaflet posiciona o tooltip pela largura medida no setContent, e o que crescesse no fluxo
    empurraria o círculo para a direita, para fora do polígono. */
@@ -332,22 +362,22 @@
   text-shadow: none;
 }
 
+/* Número limpo, sem halo: a cor vem da faixa embaixo dele, no mesmo matiz, com contraste ≥ 4,6:1 em todas */
 .leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio .bloco-cluster {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: var(--tamanho);
-  height: var(--tamanho);
-  border-radius: 50%;
-  border: 2px solid var(--colors-brand-blue); /* azul institucional, o mesmo do preenchimento: só a quantidade importa aqui */
-  background: rgba(255, 255, 255, 0.85);
-  color: var(--colors-category-foreground);
+  display: block;
+  padding: 1px 2px; /* folga entre números vizinhos na caixa medida pelo encaixe */
   font-family: var(--font-sans);
-  font-size: calc(var(--tamanho) * 0.42);
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   line-height: 1;
+  color: var(--numero-faixa-baixa);
+  text-shadow: none;
+}
+
+.leaflet-container:not(.mostra-municipios) .leaflet-tooltip.rotulo-municipio .bloco-cluster:is(.nivel-4, .nivel-5) {
+  color: var(--numero-faixa-alta);
 }
 
 /* Cartão do nome no coroplético e da legenda das bolhas */
@@ -395,8 +425,8 @@
   z-index: 202;
 }
 
-[data-map-layer="dark"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio :is(.bloco-cluster, .bloco-nome),
-[data-map-layer="satellite"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio :is(.bloco-cluster, .bloco-nome),
+[data-map-layer="dark"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio .bloco-nome,
+[data-map-layer="satellite"] .leaflet-container:not(.mostra-municipios) .rotulo-municipio .bloco-nome,
 [data-map-layer="dark"] .custom-marker .legenda-obra,
 [data-map-layer="satellite"] .custom-marker .legenda-obra {
   background: rgba(15, 23, 42, 0.8);

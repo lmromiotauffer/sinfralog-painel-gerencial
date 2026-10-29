@@ -102,8 +102,8 @@ export const ImageGallery = ({
             {/* Navigation Buttons - Figma style */}
             {photos.length > 1 && (
               <>
-                <CarouselPrevious className="text-foreground border-custom-focus! bg-custom-bg-input-30 top-auto bottom-0 left-1 h-9 w-9 rounded shadow-2xs" />
-                <CarouselNext className="text-foreground border-custom-focus! bg-custom-bg-input-30 top-auto right-1 bottom-0 h-9 w-9 rounded shadow-2xs" />
+                <CarouselPrevious className="text-foreground bg-sidebar dark:bg-sidebar backdrop-blur-custom borda-vidro border-(--vidro-borda) dark:border-(--vidro-borda) top-auto bottom-0 left-1 h-9 w-9 rounded shadow-2xs" />
+                <CarouselNext className="text-foreground bg-sidebar dark:bg-sidebar backdrop-blur-custom borda-vidro border-(--vidro-borda) dark:border-(--vidro-borda) top-auto right-1 bottom-0 h-9 w-9 rounded shadow-2xs" />
               </>
             )}
           </Carousel>

@@ -62,6 +62,9 @@ export const ExecutionChart = ({ color, columns }: ExecutionChartProps) => {
   const chartOption = useMemo(
     () => ({
       backgroundColor: "transparent",
+      // A animação de entrada redesenhava o canvas inteiro a cada quadro (~100–160 ms de JS) bem durante o voo do
+      // mapa e o deslize do card; a entrada do card já anuncia os dados
+      animation: false,
       tooltip: {
         trigger: "axis",
         backgroundColor: palette.surface,

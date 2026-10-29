@@ -8,7 +8,7 @@
     "dev:lib": "npm run link-lib && vite --mode dev",
     "dev:prd": "vite --mode prd",
     "build:dev": "tsc -b && vite build --mode dev",
-    "build": "vite build --mode prd",
+    "build": "npm run check-lib && tsc -b && vite build --mode prd",
     "build:no-lint": "npm run check-lib && vite build --mode prd",
     "lint": "eslint .",
     "test": "node --test \"src/**/*.test.ts\"",

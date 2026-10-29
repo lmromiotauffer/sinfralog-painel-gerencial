@@ -191,7 +191,6 @@ export const ObrasList = ({
               key={virtualItem.key}
               data-index={virtualItem.index}
               data-ordem
-              ref={rowVirtualizer.measureElement}
               style={{
                 "--ordem": ordem,
                 position: "absolute",

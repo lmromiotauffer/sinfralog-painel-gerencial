@@ -39,17 +39,18 @@ const quebrarAoMeio = (nome: string) => {
   return corte < 0 ? nome : `${nome.slice(0, corte)}<br>${nome.slice(corte + 1)}`;
 };
 
-// Ordem das tentativas até caber no bloco: nome em uma linha, em duas linhas, e só o círculo.
-// No coroplético vale só a última: o círculo com a quantidade fica à mostra e o nome aparece no hover.
+// Ordem das tentativas até caber no bloco: nome em uma linha, em duas linhas, e só o número.
+// No coroplético vale só a última: a quantidade fica à mostra e o nome aparece no hover.
 const TENTATIVAS: { duasLinhas: boolean; semNome: boolean }[] = [
   { duasLinhas: false, semNome: false },
   { duasLinhas: true, semNome: false },
   { duasLinhas: false, semNome: true },
 ];
 
-// Círculo do bloco escala com a quantidade, como o cluster, numa faixa menor
-const CIRCULO_MIN = 20;
-const CIRCULO_MAX = 36;
+// Faixas fixas de quantidade (1–2, 3–5, 6–10, 11–25, 26+): a mesma cor vale o mesmo número com qualquer filtro.
+// nivel-0 é sem obras. Cores em index.css (--coropletico-*).
+const FAIXAS = [2, 5, 10, 25];
+const nivel = (quantidade: number) => (quantidade ? 1 + FAIXAS.filter((limite) => quantidade > limite).length : 0);
 
 // Municípios de MT: contorno + rótulo em zoom próximo; coroplético por quantidade de obras em zoom afastado
 export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps) => {
@@ -61,6 +62,14 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
     appRef.current = app;
   }, [app]);
   const rotulosRef = useRef(new Map<string, L.Tooltip>());
+  // Tamanho do conteúdo hoje escrito em cada rótulo (medido pelo encaixe abaixo), usado para centrá-lo no polo
+  const tamanhoAplicadoRef = useRef(new Map<string, { width: number; height: number }>());
+  // Tamanho de cada rótulo por conteúdo (tentativa, modo e quantidade): depende do conteúdo e do CSS, não do zoom
+  // nem do filtro. Persiste entre filtros: re-medir os ~140 rótulos a cada filtro custava ~100 ms e reiniciava a
+  // animação de entrada de todos os números.
+  const tamanhosRef = useRef(new Map<string, { width: number; height: number }>());
+  // Chave do conteúdo já escrito em cada elemento, para só tocar no DOM o que mudou
+  const aplicadoRef = useRef(new Map<string, string>());
   // Rótulo com .rotulo-ativo e o polígono sob o cursor. O Edge às vezes não entrega o mouseout do polígono e o
   // rótulo ficava preso, então qualquer mousemove fora dele (no mapa ou no resto da página) também limpa.
   const ativoRef = useRef<{ poligono: Element; rotulo: Element } | null>(null);
@@ -86,37 +95,59 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
     return contagem;
   }, [works]);
 
-  const estilo = useMemo(() => {
-    const maximo = Math.max(1, ...obrasPorMunicipio.values());
-    return (feature?: Feature) => {
-      const quantidade = obrasPorMunicipio.get(feature?.properties?.nome) ?? 0;
-      return {
-        className: "municipio",
-        color: COR_CONTORNO[currentLayer],
-        weight: 1,
-        // Escala log: a distribuição é muito concentrada (Cuiabá com ~100 obras, mediana 5), linear ou raiz apagam o interior
-        fillOpacity: quantidade ? 0.15 + 0.6 * (Math.log1p(quantidade) / Math.log1p(maximo)) : 0,
-      };
-    };
-  }, [obrasPorMunicipio, currentLayer]);
+  // Preenchimento opaco: com opacidade o basemap (já tingido de azul no escuro) vazava e apagava as faixas baixas
+  const estilo = useMemo(
+    () => (feature?: Feature) => ({
+      className: `municipio nivel-${nivel(obrasPorMunicipio.get(feature?.properties?.nome) ?? 0)}`,
+      color: COR_CONTORNO[currentLayer],
+      weight: 1,
+      fillOpacity: 1,
+    }),
+    [obrasPorMunicipio, currentLayer],
+  );
+
+  // O Leaflet só aplica o className ao criar o polígono (o setStyle ignora): a camada nasce antes dos dados, com
+  // tudo em nivel-0. A cada nova contagem a faixa é trocada direto no elemento.
+  const geoRef = useRef<L.GeoJSON>(null);
+  useEffect(() => {
+    geoRef.current?.eachLayer((camada) => {
+      const elemento = (camada as L.Path).getElement();
+      const nome = (camada as L.Polygon).feature?.properties?.nome;
+      if (!elemento) return;
+      elemento.classList.remove(...[0, 1, 2, 3, 4, 5].map((n) => `nivel-${n}`));
+      elemento.classList.add(`nivel-${nivel(obrasPorMunicipio.get(nome) ?? 0)}`);
+    });
+  }, [obrasPorMunicipio]);
 
   // Rótulos são tooltips próprios ancorados no polo de inacessibilidade (o Leaflet ancoraria no centroide,
   // que em municípios irregulares cai na borda). Independem da camada GeoJSON, que remonta ao trocar de tile.
   // Visibilidade decidida pelo encaixe abaixo (.rotulo-cabe).
   useEffect(() => {
     const rotulos = rotulosRef.current;
+    const aplicado = aplicadoRef.current;
+    const tamanhoAplicado = tamanhoAplicadoRef.current;
     municipios.forEach(({ nome, polo }) => {
-      rotulos.set(
-        nome,
-        L.tooltip({ permanent: true, direction: "center", className: "rotulo-municipio", pane: "overlayPane" })
-          .setLatLng([polo.lat, polo.lng])
-          .setContent(nome)
-          .addTo(map),
-      );
+      const rotulo = L.tooltip({ permanent: true, direction: "center", className: "rotulo-municipio", pane: "overlayPane" })
+        .setLatLng([polo.lat, polo.lng])
+        .setContent(nome);
+      // O Leaflet lê offsetWidth/offsetHeight de cada rótulo no zoomanim e no zoomend, intercalado com a escrita da
+      // posição: um layout forçado por rótulo (~140 por passo de zoom, a travada). Centra pelo tamanho já medido.
+      const interno = rotulo as unknown as { _setPosition: (pos: L.Point) => void };
+      const posicionarLeaflet = interno._setPosition.bind(rotulo);
+      interno._setPosition = (pos) => {
+        const tamanho = tamanhoAplicado.get(nome);
+        const elemento = rotulo.getElement();
+        if (!tamanho || !elemento) return posicionarLeaflet(pos);
+        L.DomUtil.setPosition(elemento, pos.subtract([Math.round(tamanho.width / 2), Math.round(tamanho.height / 2)]));
+      };
+      rotulos.set(nome, rotulo.addTo(map));
     });
     return () => {
       rotulos.forEach((rotulo) => rotulo.remove());
       rotulos.clear();
+      // Elementos novos nascem só com o nome: nada do que foi escrito vale para eles
+      aplicado.clear();
+      tamanhoAplicado.clear();
     };
   }, [map]);
 
@@ -126,44 +157,32 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
   // ponytail: testa cantos, não arestas; uma reentrância entre dois cantos ainda pode ser cruzada pela borda do texto
   useEffect(() => {
     let agendado = 0;
-    // Tamanho de cada rótulo por tentativa e modo: depende do conteúdo e do CSS, não do zoom. Medido uma vez por
-    // filtro (o efeito recomeça quando obrasPorMunicipio muda) e reaproveitado a cada zoom/pan.
-    const tamanhos = new Map<string, { width: number; height: number }>();
-    // Conteúdo já escrito em cada elemento, para só tocar no DOM o que mudou
-    const aplicado = new Map<string, string>();
+    const tamanhos = tamanhosRef.current;
+    const aplicado = aplicadoRef.current;
 
     // noZoom: chamado no início de um zoom animado (ver aoAnimarZoom)
     const resolver = (noZoom = false) => {
       agendado = 0;
       const ocupados: DOMRect[] = [];
       const quantidade = (nome: string) => obrasPorMunicipio.get(nome) ?? 0;
-      const maximo = Math.max(1, ...obrasPorMunicipio.values());
       const coropletico = emModoCoropletico(map);
       const tentativas = coropletico ? TENTATIVAS.filter((t) => t.semNome) : TENTATIVAS;
-      const chave = (nome: string, t: number) => `${nome}|${t}|${coropletico}`;
-      // Sem obras o bloco fica sem preenchimento, o que já diz zero: só o nome, sem círculo.
+      // A quantidade entra na chave: num filtro novo só o rótulo cujo número mudou é medido e reescrito
+      const chave = (nome: string, t: number) => `${nome}|${t}|${coropletico}|${quantidade(nome)}`;
+      // Sem obras o bloco fica na cor do zero, o que já diz zero: só o nome, sem número.
+      // A faixa no número escolhe a cor do texto que contrasta com o preenchimento embaixo.
       const conteudoRotulo = (nome: string, duasLinhas: boolean) => {
         const total = quantidade(nome);
-        const tamanho = Math.round(CIRCULO_MIN + (CIRCULO_MAX - CIRCULO_MIN) * (Math.log1p(total) / Math.log1p(maximo)));
-        const circulo = total ? `<b class="bloco-cluster" style="--tamanho: ${tamanho}px">${total}</b>` : "";
-        return `${circulo}<span class="bloco-nome">${duasLinhas ? quebrarAoMeio(nome) : nome}</span>`;
+        const numero = total ? `<b class="bloco-cluster nivel-${nivel(total)}">${total}</b>` : "";
+        return `${numero}<span class="bloco-nome">${duasLinhas ? quebrarAoMeio(nome) : nome}</span>`;
       };
       const container = map.getContainer().getBoundingClientRect();
       const paraLatLng = (x: number, y: number) =>
         map.containerPointToLatLng([x - container.left, y - container.top]);
-      // Retângulo: os quatro cantos. Círculo: quatro extremos da circunferência e os cantos do quadrado inscrito
-      const dentroDoBloco = (caixa: DOMRect, circulo: boolean, aneis: (typeof municipios)[number]["aneis"]) => {
-        const { left, right, top, bottom, width, height } = caixa;
-        const cx = left + width / 2;
-        const cy = top + height / 2;
-        const recuo = (1 - Math.SQRT1_2) / 2; // canto do quadrado inscrito no círculo
-        const pontos = circulo
-          ? [
-              [cx, top], [cx, bottom], [left, cy], [right, cy],
-              [left + width * recuo, top + height * recuo], [right - width * recuo, top + height * recuo],
-              [left + width * recuo, bottom - height * recuo], [right - width * recuo, bottom - height * recuo],
-            ]
-          : [[left, top], [right, top], [left, bottom], [right, bottom]];
+      // Os quatro cantos do rótulo
+      const dentroDoBloco = (caixa: DOMRect, aneis: (typeof municipios)[number]["aneis"]) => {
+        const { left, right, top, bottom } = caixa;
+        const pontos = [[left, top], [right, top], [left, bottom], [right, bottom]];
         const coordenadas = pontos.map(([x, y]) => paraLatLng(x, y));
         return aneis.some((anel) => coordenadas.every((c) => dentroDoAnel(anel, c.lng, c.lat)));
       };
@@ -210,10 +229,10 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
             const { duasLinhas, semNome } = tentativas[t];
             if (duasLinhas && !r.nome.includes(" ")) continue;
             ultima = t;
-            // Sem obras não há círculo: nada em repouso, o nome fica para o hover
+            // Sem obras não há número: nada em repouso, o nome fica para o hover
             if (semNome && !quantidade(r.nome)) break;
             const c = caixa(r, t);
-            if (dentroDoBloco(c, semNome, r.aneis) && !ocupados.some((o) => intersecta(c, o))) {
+            if (dentroDoBloco(c, r.aneis) && !ocupados.some((o) => intersecta(c, o))) {
               ocupados.push(c);
               escolha = { t, cabe: true };
             }
@@ -226,8 +245,9 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
           if (noZoom || aplicado.get(r.nome) === chave(r.nome, t)) return;
           aplicado.set(r.nome, chave(r.nome, t));
           aplicar(r.elemento, r.nome, tentativas[t]);
-          // Conteúdo novo, tamanho novo: recentraliza no polo como o Leaflet faria, sem medir de novo
+          // Conteúdo novo, tamanho novo: recentraliza no polo, sem medir de novo
           const { width, height } = tamanhos.get(chave(r.nome, t))!;
+          tamanhoAplicadoRef.current.set(r.nome, { width, height });
           L.DomUtil.setPosition(
             r.elemento,
             map.latLngToLayerPoint([r.polo.lat, r.polo.lng]).subtract([Math.round(width / 2), Math.round(height / 2)]),
@@ -251,11 +271,13 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
 
     // A fonte condensada é webfont (display=swap): o que foi medido antes dela chegar vale de novo
     let ativo = true;
-    document.fonts.ready.then(() => {
-      if (!ativo) return;
-      tamanhos.clear();
-      agendar();
-    });
+    if (document.fonts.status !== "loaded") {
+      document.fonts.ready.then(() => {
+        if (!ativo) return;
+        tamanhos.clear();
+        agendar();
+      });
+    }
 
     map.on("zoomend moveend", agendar);
     map.on("zoomanim", aoAnimarZoom);
@@ -270,6 +292,7 @@ export const CamadaMunicipios = ({ works, currentLayer }: CamadaMunicipiosProps)
 
   return (
     <GeoJSON
+      ref={geoRef}
       key={`geo-all-${currentLayer}`}
       data={municipiosMT as GeoJsonObject}
       style={estilo}

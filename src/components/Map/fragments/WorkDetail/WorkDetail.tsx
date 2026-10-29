@@ -34,10 +34,12 @@ export const WorkDetail = ({ config }: { config?: any }) => {
       setWorkPhotos,
     } = useMapActions();
     const { isDark } = useTheme();
-    const { workDetails, workPhotos } = useWorkDetails({
+    const { workDetails: detalhesQlik, workPhotos } = useWorkDetails({
       detailsColumns: config?.detailsColumns,
       photoColumns: config?.photoColumns,
     });
+    // Até o Qlik aplicar a nova seleção os detalhes ainda são da obra anterior: só valem com o mesmo id
+    const workDetails = detalhesQlik && detalhesQlik.id === selectedWork?.id ? detalhesQlik : null;
 
     // Update selected work routes and geoTrechos when details are loaded
     useEffect(() => {

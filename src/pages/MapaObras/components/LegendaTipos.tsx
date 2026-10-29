@@ -25,7 +25,7 @@ export const LegendaTipos = ({ works, className }: LegendaTiposProps) => {
     <div className={cn("legenda-tipos grid", className)}>
       <ul
         aria-label="Legenda dos tipos de obra"
-        className="flex min-h-0 select-none flex-col gap-1 overflow-hidden rounded-lg border border-input bg-sidebar px-2.5 py-2 shadow-lg backdrop-blur-custom"
+        className="flex min-h-0 select-none flex-col gap-1 overflow-hidden rounded-lg borda-vidro bg-sidebar px-2.5 py-2 shadow-lg backdrop-blur-custom"
       >
         {tipos.map((tipo) => (
           <li

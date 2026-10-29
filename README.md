@@ -71,8 +71,6 @@ Exemplo:
 }
 ```
 
-> **Importante:** antes de alterar fórmulas, colunas, integrações ou o mapa de obras, leia o arquivo [`instructions.md`](instructions.md). Ele contém regras e restrições específicas do projeto.
-
 ## Scripts
 
 ```bash

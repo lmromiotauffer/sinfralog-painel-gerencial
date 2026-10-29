@@ -1,9 +1,12 @@
-import { useMemo } from "react";
-import { useTable } from "@cluster-data-experience/qlik-modules";
+import { useEffect, useMemo, useState } from "react";
+import { useTable, type Cell } from "@cluster-data-experience/qlik-modules";
 import type { Work } from "../types";
 import { municipioDoPonto } from "../utils/municipios";
 import { nomeCurtoObra } from "../utils/nomeObra";
 import { parsePonto } from "../utils/mapUtils";
+import { celulasOrdemEngine } from "@/shared/utils/celulasOrdemEngine";
+import { paginasExportacao } from "@/shared/components/CustomTable/exportarPlanilha";
+import { safeQNum } from "@/shared/utils/safeQNum";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useMapData = (config?: any) => {
@@ -12,18 +15,47 @@ export const useMapData = (config?: any) => {
     pageHeight: 1000,
   });
 
-  const { data, isLoading, isFetching } = table;
+  const { data, layout, isLoading, isFetching, getDataPage } = table;
+
+  // A lib só traz a 1ª página: as linhas além dela vêm aqui, marcadas com o layout de origem para
+  // linhas de um filtro antigo nunca se misturarem às do atual
+  const [linhasExtras, setLinhasExtras] = useState<{ layout: unknown; linhas: Cell[][] }>({ layout: null, linhas: [] });
+  useEffect(() => {
+    const cubo = layout?.qHyperCube;
+    const total = cubo?.qSize?.qcy ?? 0;
+    const qcx = cubo?.qSize?.qcx ?? 0;
+    const carregadas = cubo?.qDataPages?.[0]?.qMatrix?.length ?? 0;
+    if (!layout || !qcx || total <= carregadas) return;
+    let ativo = true;
+    (async () => {
+      const linhas: Cell[][] = [];
+      // Em sequência, como na exportação: um pedido por vez no socket
+      for (const pagina of paginasExportacao(total, qcx, carregadas)) {
+        const resposta = ((await getDataPage([pagina], "S")) ?? []) as EngineAPI.INxDataPage[];
+        if (!ativo) return;
+        linhas.push(...resposta.flatMap((p) => p.qMatrix as unknown as Cell[][]));
+      }
+      setLinhasExtras({ layout, linhas });
+    })().catch((erro) => console.warn("[useMapData] Erro ao buscar as obras além da 1ª página:", erro));
+    return () => {
+      ativo = false;
+    };
+  }, [layout, getDataPage]);
+
   // Parse works from Qlik data
   const works = useMemo<Work[]>(() => {
     if (!data || !data.rows) {
       return [];
     }
 
+    const extras = linhasExtras.layout === layout ? linhasExtras.linhas : [];
+    const linhas = [...data.rows.map((row) => row.cells), ...extras];
+
     // Use Map to deduplicate by _skObra (work ID)
     const worksMap = new Map<string, Work>();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data.rows.forEach((row: any, index: number) => {
+    linhas.forEach((celulas, index: number) => {
+      const cells = celulasOrdemEngine(celulas, layout?.qHyperCube);
       // IMPORTANT: Qlik orders cells as DIMENSIONS FIRST, then MEASURES
       // JSON column order: _skObra, Tipo, Contrato, cdLote, Local, Execução, Valor, Foto, Descrição
       // Dimensions: _skObra (0), Tipo (1), Contrato (2), cdLote (3), Local (4)
@@ -40,29 +72,29 @@ export const useMapData = (config?: any) => {
       // cells[7] = Foto (measure 2)
       // cells[8] = Descrição da obra (measure 3)
 
-      const id = row.cells[0]?.qText || `work-${index}`;
+      const id = cells[0]?.qText || `work-${index}`;
 
       // Skip if we already have this work (deduplicate)
       if (worksMap.has(id)) {
         return;
       }
 
-      const category = row.cells[1]?.qText || "Outros";
-      const contractNumber = row.cells[2]?.qText || "-";
-      const codigoObra = row.cells[3]?.qText || undefined;
-      const fotoUrl = row.cells[7]?.qText || undefined;
-      const descricao = row.cells[8]?.qText;
+      const category = cells[1]?.qText || "Outros";
+      const contractNumber = cells[2]?.qText || "-";
+      const codigoObra = cells[3]?.qText || undefined;
+      const fotoUrl = cells[7]?.qText || undefined;
+      const descricao = cells[8]?.qText;
       const title = (descricao && descricao !== "-" && nomeCurtoObra(descricao)) || id;
 
       // Parse location from cells[4] (Local da obra) - specific point for the bubble
-      const location = parsePonto(row.cells[4]?.qText);
+      const location = parsePonto(cells[4]?.qText);
 
       // cells[5] = Execução (measure 0) - percentage
       // cells[6] = Valor (measure 1) - used for bubble size
       const executionPercentage = Math.round(
-        (parseFloat(row.cells[5]?.qNum) || 0) * 100,
+        safeQNum(cells[5]?.qNum) * 100,
       );
-      const value = parseFloat(row.cells[6]?.qNum) || 0;
+      const value = safeQNum(cells[6]?.qNum);
 
       // Calculate size factor based on fixed range 0 to 100M
       const CAP_VALUE = 100000000; // 100 milhões
@@ -99,7 +131,7 @@ export const useMapData = (config?: any) => {
     });
 
     return Array.from(worksMap.values());
-  }, [data]);
+  }, [data, layout, linhasExtras]);
 
   return {
     works,

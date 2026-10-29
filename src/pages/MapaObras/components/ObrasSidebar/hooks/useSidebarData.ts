@@ -1,10 +1,11 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useTable } from "@cluster-data-experience/qlik-modules";
 import { municipioDoPonto } from "@/components/Map/utils/municipios";
 import { parsePonto } from "@/components/Map/utils/mapUtils";
 import { nomeCurtoObra } from "@/components/Map/utils/nomeObra";
 import { safeQNum } from "@/shared/utils/safeQNum";
 import { celulasOrdemEngine } from "@/shared/utils/celulasOrdemEngine";
+import { mesclarPaginaObras } from "./mesclarPaginaObras";
 
 export interface SidebarObra {
   id: string;
@@ -30,7 +31,6 @@ const PAGE_SIZE = 1000;
 export const useSidebarData = (config?: any) => {
 
   const [accumulatedObras, setAccumulatedObras] = useState<SidebarObra[]>([]);
-  const firstPageSignatureRef = useRef<string>("");
 
   const table = useTable({
     columns: config?.columns || [],
@@ -117,45 +117,12 @@ export const useSidebarData = (config?: any) => {
     return Array.from(obrasMap.values());
   }, [data, layout]);
 
-  // Accumulate obras or reset on filter change
+  // A lib volta a qTop 0 a cada layout novo (filtro): a 1ª página troca a lista, as seguintes acrescentam
+  const qTop = currentPage?.qTop || 0;
   useEffect(() => {
-    if (currentPageObras.length === 0) return;
-
-    const isFirstPage = (currentPage?.qTop || 0) === 0;
-
-    if (isFirstPage) {
-      // Signature from first 5 IDs of first page to detect filter changes
-      const currentFirstPageSignature = (data?.rows ?? [])
-        .slice(0, 5)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((r: any) => r.cells[0]?.qText)
-        .join("|");
-
-      // Check if this is a new dataset (filter changed)
-      const isNewDataset =
-        firstPageSignatureRef.current !== "" &&
-        firstPageSignatureRef.current !== currentFirstPageSignature;
-
-      if (accumulatedObras.length === 0 || isNewDataset) {
-        // Reset: first load or filter changed
-        setAccumulatedObras(currentPageObras);
-        firstPageSignatureRef.current = currentFirstPageSignature;
-      }
-    } else {
-      // Append new pages (not first page)
-      setAccumulatedObras((prev) => {
-        const existingIds = new Set(prev.map((o) => o.id));
-        const newObras = currentPageObras.filter((o) => !existingIds.has(o.id));
-        if (newObras.length === 0) return prev;
-        return [...prev, ...newObras];
-      });
-    }
-  }, [
-    currentPageObras,
-    currentPage?.qTop,
-    data,
-    accumulatedObras.length,
-  ]);
+    if (!data) return;
+    setAccumulatedObras((anteriores) => mesclarPaginaObras(anteriores, currentPageObras, qTop));
+  }, [data, currentPageObras, qTop]);
 
   // Load more function for infinite scroll
   const loadMore = useCallback(() => {

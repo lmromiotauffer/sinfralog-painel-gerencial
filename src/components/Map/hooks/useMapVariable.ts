@@ -14,17 +14,12 @@ export const useMapVariable = () => {
       if (!app) return;
 
       try {
-        // Set variable for expressions using $(vObraSelecionada)
-        const variable = await app.getVariableByName(MAP_VARIABLE_NAME);
-        if (variable) {
-          await variable.setStringValue(obraId);
-        }
-
-        // Make field selection for expressions using P(_skObra)
-        const field = await app.getField(OBRA_FIELD_NAME);
-        if (field) {
-          await field.selectValues([{ qText: obraId }], false, false);
-        }
+        // Variável (expressões com $(vObraSelecionada)) e seleção (P(_skObra)) são independentes: em paralelo,
+        // o clique na bolha espera uma ida ao Qlik, não duas
+        await Promise.all([
+          app.getVariableByName(MAP_VARIABLE_NAME).then((variable) => variable?.setStringValue(obraId)),
+          app.getField(OBRA_FIELD_NAME).then((field) => field?.selectValues([{ qText: obraId }], false, false)),
+        ]);
       } catch (error) {
         console.warn(`[useMapVariable] Error setting selection:`, error);
       }

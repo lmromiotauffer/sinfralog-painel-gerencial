@@ -192,6 +192,24 @@ body::after {
   --palette-light-destructive: #a8201a;
   --palette-dark-destructive: #f2665f;
   --colors-category-foreground: #172033;
+  /* Coroplético do mapa de obras: 0 = sem obras (o mesmo azul quase sem croma, para não ler como buraco), 1 a 5 = faixas 1–2, 3–5, 6–10, 11–25, 26+.
+     Um matiz (o do azul de ação), luminosidade em degraus de 0,06 a 0,12 (OKLCH). Mapa claro escurece até o
+     azul de ação; mapa escuro clareia (mais obras = mais luz). Depende do fundo do mapa, não da classe .dark.
+     Número sobre a faixa: texto claro ou escuro do mesmo matiz, sem halo, ≥ 4,6:1 em todas as faixas. */
+  --coropletico-claro-0: #eceef1;
+  --coropletico-claro-1: #dee8fd;
+  --coropletico-claro-2: #b8cbf3;
+  --coropletico-claro-3: #89a7e7;
+  --coropletico-claro-4: #4066c2;
+  --coropletico-claro-5: var(--colors-brand-blue);
+  --coropletico-escuro-0: #2a303d;
+  --coropletico-escuro-1: #303d58;
+  --coropletico-escuro-2: #394e7e;
+  --coropletico-escuro-3: #4160a7;
+  --coropletico-escuro-4: #5981e0;
+  --coropletico-escuro-5: #7fa8ff;
+  --coropletico-texto-claro: #f0f5ff;
+  --coropletico-texto-escuro: #0f1932;
 
   /* Primitive Colors */
   --colors-accent: color-mix(in srgb, var(--colors-brand-blue) 8%, var(--palette-light-surface));

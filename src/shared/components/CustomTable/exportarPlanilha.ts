@@ -14,11 +14,11 @@ export const mapaVisualParaEngine = (colunas: Column[]): number[] => {
 // uma chamada por página, senão ele recusa com "Result too large"
 const CELULAS_POR_CHAMADA = 10000;
 
-/** Páginas de linhas inteiras, do topo ao fim da tabela, cada uma dentro do limite de células do engine */
-export const paginasExportacao = (totalRows: number, qcx: number): EngineAPI.INxPage[] => {
+/** Páginas de linhas inteiras, de `inicio` ao fim da tabela, cada uma dentro do limite de células do engine */
+export const paginasExportacao = (totalRows: number, qcx: number, inicio = 0): EngineAPI.INxPage[] => {
   const alturaPagina = Math.max(1, Math.floor(CELULAS_POR_CHAMADA / qcx));
   const paginas: EngineAPI.INxPage[] = [];
-  for (let qTop = 0; qTop < totalRows; qTop += alturaPagina) {
+  for (let qTop = inicio; qTop < totalRows; qTop += alturaPagina) {
     paginas.push({ qTop, qLeft: 0, qWidth: qcx, qHeight: Math.min(alturaPagina, totalRows - qTop) });
   }
   return paginas;

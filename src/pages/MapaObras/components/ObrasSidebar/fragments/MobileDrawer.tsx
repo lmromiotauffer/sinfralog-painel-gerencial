@@ -27,7 +27,7 @@ export const MobileDrawer = ({ obrasCount, maisPorCarregar, children, isOpen, on
           <DrawerTrigger asChild>
             <button
               type="button"
-              className="bg-sidebar border-input hover:bg-accent/50 relative flex h-11 w-full cursor-pointer items-center justify-between rounded-lg border px-3 shadow-md backdrop-blur-[10px] transicao-feedback"
+              className="bg-sidebar borda-vidro hover:bg-accent/50 relative flex h-11 w-full cursor-pointer items-center justify-between rounded-lg px-3 shadow-md backdrop-blur-[10px] transicao-feedback"
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold">Lista de Obras</span>
@@ -39,8 +39,7 @@ export const MobileDrawer = ({ obrasCount, maisPorCarregar, children, isOpen, on
             </button>
           </DrawerTrigger>
           <DrawerContent
-            className="border-input border mx-2 h-[638px] max-h-[85dvh] flex flex-col outline-none"
-            style={{ backgroundColor: "var(--colors-custom-components-bg)" }}
+            className="bg-sidebar dark:bg-sidebar backdrop-blur-custom borda-vidro border-(--vidro-borda) dark:border-(--vidro-borda) mx-2 h-[638px] max-h-[85dvh] flex flex-col outline-none"
           >
             <DrawerHeader className="pb-2 text-left">
               <DrawerTitle className="text-lg font-bold">

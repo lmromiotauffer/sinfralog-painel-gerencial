@@ -81,7 +81,7 @@ export const CarouselImage = ({
             size="icon"
             variant="outline"
             aria-label={`Abrir foto ${index + 1} em tamanho real`}
-            className="bg-custom-bg-input-30 border-custom-focus! h-9 w-9 rounded shadow-2xs"
+            className="text-foreground bg-sidebar dark:bg-sidebar backdrop-blur-custom borda-vidro border-(--vidro-borda) dark:border-(--vidro-borda) h-9 w-9 rounded shadow-2xs"
             onClick={() => {
               window.open(photo.url, "_blank");
             }}

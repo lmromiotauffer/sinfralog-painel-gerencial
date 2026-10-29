@@ -168,7 +168,7 @@ export const ObrasSidebar = ({
       className={cn(
         // Só a largura anima; recolher é mais rápido que expandir. Sem transition-none no movimento reduzido:
         // o transitionend da largura é o que devolve o conteúdo (o CSS global já encurta para 0.01ms)
-        "bg-sidebar backdrop-blur-custom border-input flex h-full flex-col rounded-lg border transition-[width] ease-cor",
+        "bg-sidebar backdrop-blur-custom borda-vidro flex h-full flex-col rounded-lg transition-[width] ease-cor",
         isExpanded ? "w-full duration-250" : "w-60 duration-200",
         className,
       )}

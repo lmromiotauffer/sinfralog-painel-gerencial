@@ -13,6 +13,8 @@ export const ColisaoLegendas = () => {
 
     const resolver = () => {
       agendado = 0;
+      // No coroplético bolhas e legendas estão ocultas: medir centenas de ícones a cada zoom era trabalho perdido
+      if (!map.getContainer().classList.contains("mostra-municipios")) return;
       const obstaculos = Array.from(
         map.getContainer().querySelectorAll<HTMLElement>(".custom-marker, .custom-marker-cluster"),
       );

@@ -8,6 +8,19 @@ interface UseFetchJsonReturnType {
   isLoading: boolean;
 }
 
+// Um download por URL na sessão: o layout e a página do mapa leem o mesmo mapa-de-obras.json.
+// Falha sai do cache, para a próxima montagem tentar de novo
+const downloads = new Map<string, Promise<JsonConfig>>();
+const baixarJson = (url: string) => {
+  let download = downloads.get(url);
+  if (!download) {
+    download = fetch(url).then((response) => response.json());
+    downloads.set(url, download);
+    download.catch(() => downloads.delete(url));
+  }
+  return download;
+};
+
 const useFetchJson = (url: string): UseFetchJsonReturnType => {
   const [data, setData] = useState<JsonConfig | null>(
     null,
@@ -17,8 +30,7 @@ const useFetchJson = (url: string): UseFetchJsonReturnType => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(url);
-        const jsonData = await response.json();
+        const jsonData = await baixarJson(url);
         setData(jsonData);
       } catch (error) {
         console.error(`Erro ao carregar ${url}`, error);
