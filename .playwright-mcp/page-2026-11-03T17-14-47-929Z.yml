@@ -1,0 +1,397 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic [ref=e18]:
+              - generic [ref=e19]:
+                - img "Governo de Mato Grosso" [ref=e21]
+                - button "Expandir menu" [ref=e24] [cursor=pointer]
+              - navigation "Navegação principal" [ref=e26]:
+                - list [ref=e27]:
+                  - listitem [ref=e28]:
+                    - button "Mapa de Obras" [ref=e29] [cursor=pointer]
+                  - listitem [ref=e32]:
+                    - button "Obras" [ref=e33] [cursor=pointer]
+                  - listitem [ref=e36]:
+                    - button "Contratos" [ref=e37] [cursor=pointer]
+                  - listitem [ref=e40]:
+                    - button "Análise Customizada" [ref=e41] [cursor=pointer]
+              - button "Tema do sistema. Mudar para tema claro" [ref=e46] [cursor=pointer]
+            - generic:
+              - generic:
+                - banner [ref=e50]:
+                  - generic [ref=e51]:
+                    - generic [ref=e52]:
+                      - generic [ref=e53]: "Filtros:"
+                      - button "Contrato" [ref=e57] [cursor=pointer]
+                      - button "Situação do contrato" [ref=e62] [cursor=pointer]
+                      - button "Credor" [ref=e67] [cursor=pointer]
+                      - button "Município" [ref=e72] [cursor=pointer]
+                    - button "Mais filtros" [ref=e78] [cursor=pointer]
+                  - separator [ref=e80]
+                  - generic "Filtros aplicados" [ref=e82]:
+                    - generic [ref=e83]: Nenhum filtro aplicado.
+                    - generic: "Filtros aplicados:"
+                    - button:
+                      - generic: Limpar filtros
+                - generic:
+                  - generic:
+                    - main:
+                      - generic:
+                        - generic:
+                          - generic [ref=e86]:
+                            - generic [ref=e87]:
+                              - generic [ref=e92]:
+                                - heading "Mapa de Obras" [level=1] [ref=e93]
+                                - button "Como ler o mapa" [ref=e94] [cursor=pointer]
+                              - generic [ref=e97]: Encontre dados sobre obras da SINFRA pelo estado de Mato Grosso.
+                            - generic [ref=e98]:
+                              - generic [ref=e99]:
+                                - combobox "Buscar..." [ref=e100]
+                                - button [aria-hidden]
+                              - generic:
+                                - status
+                          - generic:
+                            - generic [ref=e101]:
+                              - group:
+                                - button:
+                                  - generic: Satélite
+                                - button:
+                                  - generic: Ruas
+                              - 'button "Trocar fundo do mapa (atual: Padrão)" [ref=e102] [cursor=pointer]':
+                                - generic [ref=e108]: Padrão
+                            - button "Pausar a rotação dos indicadores" [ref=e117]
+                            - region [ref=e123]:
+                              - generic [ref=e125]:
+                                - group [ref=e126]:
+                                  - generic [ref=e133]:
+                                    - paragraph [ref=e134]: Quantidade de Obras
+                                    - generic [ref=e135]: "995"
+                                - group [ref=e138]:
+                                  - generic [ref=e145]:
+                                    - paragraph [ref=e146]: Valor da(s) obra(s)
+                                    - generic [ref=e147]: R$15.252.587.691,74
+                                - group [ref=e150]:
+                                  - generic [ref=e157]:
+                                    - paragraph [ref=e158]: Medido (PI + Acréscimo e Desconto)
+                                    - generic [ref=e159]: R$10.010.922.837,73
+                                - group [ref=e162]:
+                                  - generic [ref=e169]:
+                                    - paragraph [ref=e170]: "% Execução"
+                                    - generic [ref=e171]: 65,63%
+                                - group [ref=e174]:
+                                  - generic [ref=e181]:
+                                    - paragraph [ref=e182]: Diferença previsto x realizado (p.p.)
+                                    - generic [ref=e183]: 2,93
+                                - group [ref=e186]:
+                                  - generic [ref=e193]:
+                                    - paragraph [ref=e194]: Medido (PI + R + Acréscimo e Desconto)
+                                    - generic [ref=e195]: R$12.317.562.413,37
+                                - group [ref=e198]:
+                                  - generic [ref=e205]:
+                                    - paragraph [ref=e206]: Quantidade de Obras
+                                    - generic [ref=e207]: "995"
+                                - group [ref=e210]:
+                                  - generic [ref=e217]:
+                                    - paragraph [ref=e218]: Valor da(s) obra(s)
+                                    - generic [ref=e219]: R$15.252.587.691,74
+                                - group [ref=e222]:
+                                  - generic [ref=e229]:
+                                    - paragraph [ref=e230]: Medido (PI + Acréscimo e Desconto)
+                                    - generic [ref=e231]: R$10.010.922.837,73
+                                - group [ref=e234]:
+                                  - generic [ref=e241]:
+                                    - paragraph [ref=e242]: "% Execução"
+                                    - generic [ref=e243]: 65,63%
+                                - group [ref=e246]:
+                                  - generic [ref=e253]:
+                                    - paragraph [ref=e254]: Diferença previsto x realizado (p.p.)
+                                    - generic [ref=e255]: 2,93
+                                - group [ref=e258]:
+                                  - generic [ref=e265]:
+                                    - paragraph [ref=e266]: Medido (PI + R + Acréscimo e Desconto)
+                                    - generic [ref=e267]: R$12.317.562.413,37
+                    - generic [ref=e270]:
+                      - generic [ref=e271]:
+                        - generic [ref=e272]: Lista de Obras
+                        - generic [ref=e273]:
+                          - button "Ordenar" [ref=e274] [cursor=pointer]
+                          - button "Ampliar lista" [ref=e278] [cursor=pointer]
+                      - generic:
+                        - generic:
+                          - generic: Ordenação
+                          - generic:
+                            - generic:
+                              - generic: Ordenar por
+                              - combobox:
+                                - generic: Previsão de término
+                            - generic:
+                              - generic: Ordem
+                              - generic:
+                                - button:
+                                  - generic: Crescente
+                                - button [pressed]:
+                                  - generic: Decrescente
+                      - generic [ref=e284]:
+                        - generic [ref=e286]:
+                          - generic [ref=e287]:
+                            - button "Tipos de obra" [ref=e288] [cursor=pointer]
+                            - button
+                          - generic:
+                            - button:
+                              - paragraph: INFRAESTRUTURA AEROPORTUÁRIA
+                            - button:
+                              - paragraph: INFRAESTRUTURA RODOVIÁRIA
+                            - button:
+                              - paragraph: INFRAESTRUTURA URBANA
+                            - button:
+                              - paragraph: OBRA CIVIL
+                            - button:
+                              - paragraph: OBRAS DE ARTE ESPECIAIS/CORRENTES
+                            - button:
+                              - paragraph: PAVIMENTAÇÃO URBANA
+                            - button:
+                              - paragraph: TERMINAL RODOVIÁRIO
+                        - generic [ref=e291]:
+                          - generic [ref=e292]:
+                            - button "Implantação e Pavimentação, Canarana · Contrato 142/2025, 24% executado" [ref=e294] [cursor=pointer]:
+                              - generic [ref=e295]:
+                                - img "1" [ref=e296]
+                                - generic "INFRAESTRUTURA RODOVIÁRIA" [ref=e297]
+                              - generic [ref=e299]:
+                                - paragraph [ref=e300]: Implantação e Pavimentação
+                                - paragraph [ref=e301]: Canarana · Contrato 142/2025
+                                - paragraph [ref=e302]: "Valor: R$ 65.339.998,53"
+                            - button "Implantação e Pavimentação, na Rodovia, Vila Bela da Santíssima Trindade · Contrato 035/2025, 6% executado" [ref=e304] [cursor=pointer]:
+                              - generic [ref=e305]:
+                                - img "1" [ref=e306]
+                                - generic "INFRAESTRUTURA RODOVIÁRIA" [ref=e307]
+                              - generic [ref=e309]:
+                                - paragraph [ref=e310]: Implantação e Pavimentação, na Rodovia
+                                - paragraph [ref=e311]: Vila Bela da Santíssima Trindade · Contrato 035/2025
+                                - paragraph [ref=e312]: "Valor: R$ 64.452.446,00"
+                            - button "Obra de Restauração e Implantação, na Rodovia, Sorriso · Contrato 130/2025, 12% executado" [ref=e314] [cursor=pointer]:
+                              - generic [ref=e315]:
+                                - img "1" [ref=e316]
+                                - generic "INFRAESTRUTURA RODOVIÁRIA" [ref=e317]
+                              - generic [ref=e319]:
+                                - paragraph [ref=e320]: Obra de Restauração e Implantação, na Rodovia
+                                - paragraph [ref=e321]: Sorriso · Contrato 130/2025
+                                - paragraph [ref=e322]: "Valor: R$ 58.402.075,95"
+                            - button "Ponte de Concreto sobre o Rio Sem Informação (PT01802), Poconé · Contrato 049/2025, 36% executado" [ref=e324] [cursor=pointer]:
+                              - generic [ref=e325]:
+                                - img "1" [ref=e326]
+                                - generic "OBRAS DE ARTE ESPECIAIS/CORRENTES" [ref=e327]
+                              - generic [ref=e329]:
+                                - paragraph [ref=e330]: Ponte de Concreto sobre o Rio Sem Informação (PT01802)
+                                - paragraph [ref=e331]: Poconé · Contrato 049/2025
+                                - paragraph [ref=e332]: "Valor: R$ 7.588.742,59"
+                            - button "Ponte de Concreto sobre o Rio Sem Informação (PT01889), Poconé · Contrato 049/2025, 47% executado" [ref=e334] [cursor=pointer]:
+                              - generic [ref=e335]:
+                                - img "2" [ref=e336]
+                                - generic "OBRAS DE ARTE ESPECIAIS/CORRENTES" [ref=e337]
+                              - generic [ref=e339]:
+                                - paragraph [ref=e340]: Ponte de Concreto sobre o Rio Sem Informação (PT01889)
+                                - paragraph [ref=e341]: Poconé · Contrato 049/2025
+                                - paragraph [ref=e342]: "Valor: R$ 3.663.561,97"
+                            - button "Ponte de Concreto sobre o Rio Sem Informação (PT01890), Poconé · Contrato 049/2025, 0% executado" [ref=e344] [cursor=pointer]:
+                              - generic [ref=e345]:
+                                - img "3" [ref=e346]
+                                - generic "OBRAS DE ARTE ESPECIAIS/CORRENTES" [ref=e347]
+                              - generic [ref=e349]:
+                                - paragraph [ref=e350]: Ponte de Concreto sobre o Rio Sem Informação (PT01890)
+                                - paragraph [ref=e351]: Poconé · Contrato 049/2025
+                                - paragraph [ref=e352]: "Valor: R$ 4.380.983,61"
+                            - button "Ponte de Concreto sobre o Rio Sem Informação (PT01892), Poconé · Contrato 049/2025, 0% executado" [ref=e354] [cursor=pointer]:
+                              - generic [ref=e355]:
+                                - img "4" [ref=e356]
+                                - generic "OBRAS DE ARTE ESPECIAIS/CORRENTES" [ref=e357]
+                              - generic [ref=e359]:
+                                - paragraph [ref=e360]: Ponte de Concreto sobre o Rio Sem Informação (PT01892)
+                                - paragraph [ref=e361]: Poconé · Contrato 049/2025
+                                - paragraph [ref=e362]: "Valor: R$ 3.410.694,12"
+                            - button "Ponte de Concreto sobre o Rio Sem Informação (PT01893), Poconé · Contrato 049/2025, 0% executado" [ref=e364] [cursor=pointer]:
+                              - generic [ref=e365]:
+                                - img "5" [ref=e366]
+                                - generic "OBRAS DE ARTE ESPECIAIS/CORRENTES" [ref=e367]
+                              - generic [ref=e369]:
+                                - paragraph [ref=e370]: Ponte de Concreto sobre o Rio Sem Informação (PT01893)
+                                - paragraph [ref=e371]: Poconé · Contrato 049/2025
+                                - paragraph [ref=e372]: "Valor: R$ 3.023.922,07"
+                          - generic [ref=e373]: Role para ver mais obras
+  - generic [ref=e376]:
+    - generic: © CARTO © OSM
+    - generic [ref=e377]:
+      - generic:
+        - generic:
+          - img:
+            - generic:
+              - generic [ref=e378] [cursor=pointer]
+              - generic [ref=e379] [cursor=pointer]
+              - generic [ref=e380] [cursor=pointer]
+              - generic [ref=e381] [cursor=pointer]
+              - generic [ref=e382] [cursor=pointer]
+              - generic [ref=e383] [cursor=pointer]
+              - generic [ref=e384] [cursor=pointer]
+              - generic [ref=e385] [cursor=pointer]
+              - generic [ref=e386] [cursor=pointer]
+              - generic [ref=e387] [cursor=pointer]
+              - generic [ref=e388] [cursor=pointer]
+              - generic [ref=e389] [cursor=pointer]
+              - generic [ref=e390] [cursor=pointer]
+              - generic [ref=e391] [cursor=pointer]
+              - generic [ref=e392] [cursor=pointer]
+              - generic [ref=e393] [cursor=pointer]
+              - generic [ref=e394] [cursor=pointer]
+              - generic [ref=e395] [cursor=pointer]
+              - generic [ref=e396] [cursor=pointer]
+              - generic [ref=e397] [cursor=pointer]
+              - generic [ref=e398] [cursor=pointer]
+              - generic [ref=e399] [cursor=pointer]
+              - generic [ref=e400] [cursor=pointer]
+              - generic [ref=e401] [cursor=pointer]
+              - generic [ref=e402] [cursor=pointer]
+              - generic [ref=e403] [cursor=pointer]
+              - generic [ref=e404] [cursor=pointer]
+              - generic [ref=e405] [cursor=pointer]
+              - generic [ref=e406] [cursor=pointer]
+              - generic [ref=e407] [cursor=pointer]
+              - generic [ref=e408] [cursor=pointer]
+              - generic [ref=e409] [cursor=pointer]
+              - generic [ref=e410] [cursor=pointer]
+              - generic [ref=e411] [cursor=pointer]
+              - generic [ref=e412] [cursor=pointer]
+              - generic [ref=e413] [cursor=pointer]
+              - generic [ref=e414] [cursor=pointer]
+              - generic [ref=e415] [cursor=pointer]
+              - generic [ref=e416] [cursor=pointer]
+              - generic [ref=e417] [cursor=pointer]
+              - generic [ref=e418] [cursor=pointer]
+              - generic [ref=e419] [cursor=pointer]
+              - generic [ref=e420] [cursor=pointer]
+              - generic [ref=e421] [cursor=pointer]
+              - generic [ref=e422] [cursor=pointer]
+              - generic [ref=e423] [cursor=pointer]
+              - generic [ref=e424] [cursor=pointer]
+              - generic [ref=e425] [cursor=pointer]
+              - generic [ref=e426] [cursor=pointer]
+              - generic [ref=e427] [cursor=pointer]
+              - generic [ref=e428] [cursor=pointer]
+              - generic [ref=e429] [cursor=pointer]
+              - generic [ref=e430] [cursor=pointer]
+              - generic [ref=e431] [cursor=pointer]
+              - generic [ref=e432] [cursor=pointer]
+              - generic [ref=e433] [cursor=pointer]
+              - generic [ref=e434] [cursor=pointer]
+              - generic [ref=e435] [cursor=pointer]
+              - generic [ref=e436] [cursor=pointer]
+              - generic [ref=e437] [cursor=pointer]
+              - generic [ref=e438] [cursor=pointer]
+              - generic [ref=e439] [cursor=pointer]
+              - generic [ref=e440] [cursor=pointer]
+              - generic [ref=e441] [cursor=pointer]
+              - generic [ref=e442] [cursor=pointer]
+              - generic [ref=e443] [cursor=pointer]
+              - generic [ref=e444] [cursor=pointer]
+              - generic [ref=e445] [cursor=pointer]
+              - generic [ref=e446] [cursor=pointer]
+              - generic [ref=e447] [cursor=pointer]
+              - generic [ref=e448] [cursor=pointer]
+              - generic [ref=e449] [cursor=pointer]
+              - generic [ref=e450] [cursor=pointer]
+              - generic [ref=e451] [cursor=pointer]
+              - generic [ref=e452] [cursor=pointer]
+              - generic [ref=e453] [cursor=pointer]
+              - generic [ref=e454] [cursor=pointer]
+              - generic [ref=e455] [cursor=pointer]
+              - generic [ref=e456] [cursor=pointer]
+              - generic [ref=e457] [cursor=pointer]
+              - generic [ref=e458] [cursor=pointer]
+              - generic [ref=e459] [cursor=pointer]
+              - generic [ref=e460] [cursor=pointer]
+              - generic [ref=e461] [cursor=pointer]
+              - generic [ref=e462] [cursor=pointer]
+              - generic [ref=e463] [cursor=pointer]
+              - generic [ref=e464] [cursor=pointer]
+              - generic [ref=e465] [cursor=pointer]
+              - generic [ref=e466] [cursor=pointer]
+              - generic [ref=e467] [cursor=pointer]
+              - generic [ref=e468] [cursor=pointer]
+              - generic [ref=e469] [cursor=pointer]
+              - generic [ref=e470] [cursor=pointer]
+              - generic [ref=e471] [cursor=pointer]
+              - generic [ref=e472] [cursor=pointer]
+              - generic [ref=e473] [cursor=pointer]
+              - generic [ref=e474] [cursor=pointer]
+              - generic [ref=e475] [cursor=pointer]
+              - generic [ref=e476] [cursor=pointer]
+              - generic [ref=e477] [cursor=pointer]
+              - generic [ref=e478] [cursor=pointer]
+              - generic [ref=e479] [cursor=pointer]
+              - generic [ref=e480] [cursor=pointer]
+              - generic [ref=e481] [cursor=pointer]
+              - generic [ref=e482] [cursor=pointer]
+              - generic [ref=e483] [cursor=pointer]
+              - generic [ref=e484] [cursor=pointer]
+              - generic [ref=e485] [cursor=pointer]
+              - generic [ref=e486] [cursor=pointer]
+              - generic [ref=e487] [cursor=pointer]
+              - generic [ref=e488] [cursor=pointer]
+              - generic [ref=e489] [cursor=pointer]
+              - generic [ref=e490] [cursor=pointer]
+              - generic [ref=e491] [cursor=pointer]
+              - generic [ref=e492] [cursor=pointer]
+              - generic [ref=e493] [cursor=pointer]
+              - generic [ref=e494] [cursor=pointer]
+              - generic [ref=e495] [cursor=pointer]
+              - generic [ref=e496] [cursor=pointer]
+              - generic [ref=e497] [cursor=pointer]
+              - generic [ref=e498] [cursor=pointer]
+              - generic [ref=e499] [cursor=pointer]
+              - generic [ref=e500] [cursor=pointer]
+              - generic [ref=e501] [cursor=pointer]
+              - generic [ref=e502] [cursor=pointer]
+              - generic [ref=e503] [cursor=pointer]
+              - generic [ref=e504] [cursor=pointer]
+              - generic [ref=e505] [cursor=pointer]
+              - generic [ref=e506] [cursor=pointer]
+              - generic [ref=e507] [cursor=pointer]
+              - generic [ref=e508] [cursor=pointer]
+              - generic [ref=e509] [cursor=pointer]
+              - generic [ref=e510] [cursor=pointer]
+              - generic [ref=e511] [cursor=pointer]
+              - generic [ref=e512] [cursor=pointer]
+              - generic [ref=e513] [cursor=pointer]
+              - generic [ref=e514] [cursor=pointer]
+              - generic [ref=e515] [cursor=pointer]
+              - generic [ref=e516] [cursor=pointer]
+              - generic [ref=e517] [cursor=pointer]
+              - generic [ref=e518] [cursor=pointer]
+          - tooltip "4"
+          - tooltip "10"
+          - tooltip "10"
+          - tooltip "7"
+          - tooltip "24"
+          - tooltip "6"
+          - tooltip "7"
+          - tooltip "12"
+          - tooltip "4"
+          - tooltip "3"
+          - tooltip "7"
+          - tooltip "4"
+          - tooltip "11"
+          - tooltip "9"
+          - tooltip "7"
+          - tooltip "5"
+          - tooltip "6"
+          - tooltip "24"
+          - tooltip "3"
+          - tooltip "3"
+          - tooltip "5"
+          - tooltip "6"
+          - tooltip "2"
+          - tooltip "5"
+          - tooltip "1"
+          - tooltip "4"

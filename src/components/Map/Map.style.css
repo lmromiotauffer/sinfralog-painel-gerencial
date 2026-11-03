@@ -182,6 +182,14 @@
   transition: opacity var(--duracao-curta) var(--ease-saida);
 }
 
+/* A transition acima cortava o deslize do leaflet.css (.leaflet-zoom-anim .leaflet-zoom-animated): no zoom os números
+   pulavam para a posição final enquanto os municípios ainda cresciam. Antes da regra abaixo, que zera o atraso. */
+.leaflet-zoom-anim .leaflet-tooltip.rotulo-municipio {
+  transition:
+    transform 0.25s cubic-bezier(0, 0, 0.25, 1),
+    visibility 0s var(--duracao-curta);
+}
+
 .leaflet-tooltip.rotulo-municipio:is(.rotulo-cabe, .rotulo-ativo) {
   transition-delay: 0s;
 }

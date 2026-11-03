@@ -20,12 +20,20 @@ const LIMITES_MT = L.latLngBounds([
   [-7.35, -50.2],
 ]);
 const zoomEstado = (map: L.Map) =>
-  Math.min(map.getBoundsZoom(LIMITES_MT) - 0.5, ZOOM_MIN_MUNICIPIOS - 0.25);
+  Math.min(map.getBoundsZoom(LIMITES_MT) - 0.75, ZOOM_MIN_MUNICIPIOS - 0.25);
 
-// Meio nível mais afastado que o enquadramento justo (o cabeçalho e a barra de KPIs cobrem as bordas
+// ¾ de nível mais afastado que o enquadramento justo (o cabeçalho e a barra de KPIs cobrem as bordas
 // do mapa), e sempre abaixo de ZOOM_MIN_MUNICIPIOS: a visão geral é sempre coroplética
-const verEstado = (map: L.Map, reduzido: boolean) =>
-  voar(map, LIMITES_MT.getCenter(), zoomEstado(map), reduzido);
+const verEstado = (map: L.Map, reduzido: boolean) => {
+  const zoom = zoomEstado(map);
+  // Já na visão geral (ex.: obras chegando depois da abertura): não voa. Não compara o centro: em telas largas o
+  // maxBounds do MapContainer desloca o centro do setView inicial, e o voo de volta deslizava o mapa ao carregar
+  if (map.getZoom() === zoom && map.getBounds().contains(LIMITES_MT)) return;
+  // Esmaece as bolhas já na partida: o zoomend só troca de modo no fim, e o voo saindo do município (com o filtro
+  // removido) mostrava todas as obras do Estado como bolhas amontoadas durante o afastamento
+  map.getContainer().classList.remove("mostra-municipios");
+  voar(map, LIMITES_MT.getCenter(), zoom, reduzido);
+};
 
 export const MapEffect = ({ setIsFocused, setCoropletico, works }: MapEffectProps) => {
   const map = useMap();
@@ -44,7 +52,8 @@ export const MapEffect = ({ setIsFocused, setCoropletico, works }: MapEffectProp
   // --- Efeito 0: Inicialização (Starting Point) ---
   useEffect(() => {
     // Começa no coroplético com o Estado inteiro à vista (sem voo: é o primeiro quadro)
-    map.setView(LIMITES_MT.getCenter(), zoomEstado(map));
+    // animate: false porque o MapContainer já nasce num zoom e o setView animava a troca (o mapa remexia)
+    map.setView(LIMITES_MT.getCenter(), zoomEstado(map), { animate: false });
   }, [map]);
 
   // --- Efeito 0b: abaixo de ZOOM_MIN_MUNICIPIOS o mapa é coroplético (CamadaMunicipios); acima, bolhas.
@@ -180,7 +189,11 @@ export const MapEffect = ({ setIsFocused, setCoropletico, works }: MapEffectProp
       return;
     }
 
-    if (bounds.isValid()) {
+    // Obras espalhadas pelo Estado (ex.: páginas além da 1ª chegando, "Limpar filtros") ficariam no
+    // coroplético de qualquer jeito: usa a visão geral, senão o enquadramento aproximava o mapa ao carregar
+    if (bounds.isValid() && map.getBoundsZoom(bounds) < ZOOM_MIN_MUNICIPIOS) {
+      verEstado(map, reduzido);
+    } else if (bounds.isValid()) {
       voarParaLimites(
         map,
         bounds,
