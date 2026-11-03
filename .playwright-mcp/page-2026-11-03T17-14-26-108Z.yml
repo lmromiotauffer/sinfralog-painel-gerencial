@@ -1,7 +1,0 @@
-- generic [ref=e7]:
-  - img "Governo de Mato Grosso" [ref=e8]
-  - generic [ref=e9]:
-    - paragraph [ref=e10]: SINFRALOG
-    - paragraph [ref=e11]: Painel Gerencial de Obras
-  - status [ref=e12]:
-    - generic [ref=e15]: Conectando aos dados…
